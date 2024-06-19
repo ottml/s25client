@@ -150,6 +150,7 @@ void Settings::LoadDefaults()
     // }
 
     LoadIngameDefaults();
+    LoadCampaignProgressDefaults();
 }
 
 void Settings::LoadIngameDefaults()
@@ -168,6 +169,11 @@ void Settings::LoadIngameDefaults()
     for(const auto& window : persistentWindows)
         windows.persistentSettings[window.first] = PersistentWindowSettings();
     // }
+}
+
+void Settings::LoadCampaignProgressDefaults()
+{
+    campaigns.campaignStatus.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,9 +320,11 @@ void Settings::Load()
                 addons.configuration.insert(std::make_pair(s25util::fromStringClassic<unsigned>(item->getName()),
                                                            s25util::fromStringClassic<unsigned>(item->getText())));
         }
+        // }
 
         LoadIngame();
-        // }
+        LoadCampaignProgress();
+
     } catch(std::runtime_error& e)
     {
         s25util::warning(std::string("Could not use settings from \"") + settingsPath.string()
@@ -480,6 +488,7 @@ void Settings::Save()
         bfs::permissions(settingsPath, bfs::owner_read | bfs::owner_write);
 
     SaveIngame();
+    SaveCampaignProgress();
 }
 
 void Settings::SaveIngame()
@@ -530,4 +539,65 @@ void Settings::SaveIngame()
     bfs::path settingsPathIngame = RTTRCONFIG.ExpandPath(s25::resources::ingameOptions);
     if(libsiedler2::Write(settingsPathIngame, settingsIngame) == 0)
         bfs::permissions(settingsPathIngame, bfs::owner_read | bfs::owner_write);
+}
+
+void Settings::LoadCampaignProgress()
+{
+    libsiedler2::Archiv campaignProgress;
+    const auto settingsPathCampaignProgress = RTTRCONFIG.ExpandPath(s25::resources::campaignProgress);
+    try
+    {
+        if(libsiedler2::Load(settingsPathCampaignProgress, campaignProgress) != 0)
+            throw std::runtime_error("File missing");
+
+        auto convertFromString = [](std::string const& input) -> std::vector<bool> {
+            std::vector<bool> output;
+            std::transform(input.cbegin(), input.cend(), std::back_inserter(output), [](char c) { return c == '1'; });
+            return output;
+        };
+
+        for(const auto& campaign : campaignProgress)
+        {
+            const auto* status = static_cast<const libsiedler2::ArchivItem_Ini*>(campaign.get());
+            if(!status)
+                continue;
+
+            CampaignMissionStatus campaignMissionStatus;
+            campaignMissionStatus.isEnabled = convertFromString(status->getValue("enabled"));
+            campaignMissionStatus.isFinished = convertFromString(status->getValue("finished"));
+            campaigns.campaignStatus.insert(std::make_pair(status->getName(), campaignMissionStatus));
+        }
+    } catch(std::runtime_error& e)
+    {
+        s25util::warning(std::string("Could not use campaign progress settings from \"")
+                         + settingsPathCampaignProgress.string() + "\", using default values. Reason: " + e.what());
+        LoadCampaignProgressDefaults();
+        SaveCampaignProgress();
+    }
+}
+
+void Settings::SaveCampaignProgress()
+{
+    libsiedler2::Archiv campaignProgress;
+    campaignProgress.alloc(campaigns.campaignStatus.size());
+
+    auto convertToString = [](std::vector<bool> const& input) -> std::string {
+        std::string output;
+        std::transform(input.cbegin(), input.cend(), std::back_inserter(output), [](bool c) { return c ? '1' : '0'; });
+        return output;
+    };
+
+    unsigned i = 0;
+    for(auto const& campaign : campaigns.campaignStatus)
+    {
+        auto status = std::make_unique<libsiedler2::ArchivItem_Ini>(campaign.first);
+        status->setValue("enabled", convertToString(campaign.second.isEnabled));
+        status->setValue("finished", convertToString(campaign.second.isFinished));
+        campaignProgress.set(i, std::move(status));
+        i++;
+    }
+
+    bfs::path settingsPathCampaignProgress = RTTRCONFIG.ExpandPath(s25::resources::campaignProgress);
+    if(libsiedler2::Write(settingsPathCampaignProgress, campaignProgress) == 0)
+        bfs::permissions(settingsPathCampaignProgress, bfs::owner_read | bfs::owner_write);
 }

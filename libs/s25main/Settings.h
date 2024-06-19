@@ -31,6 +31,12 @@ struct PersistentWindowSettings
     bool isMinimized = false;
 };
 
+struct CampaignMissionStatus
+{
+    std::vector<bool> isEnabled;
+    std::vector<bool> isFinished;
+};
+
 /// Configuration class
 class Settings : public Singleton<Settings, SingletonPolicies::WithLongevity>
 {
@@ -45,9 +51,13 @@ public:
 protected:
     void LoadDefaults();
     void LoadIngameDefaults();
+    void LoadCampaignProgressDefaults();
 
     void LoadIngame();
     void SaveIngame();
+
+    void LoadCampaignProgress();
+    void SaveCampaignProgress();
 
 public:
     struct
@@ -128,6 +138,11 @@ public:
     {
         std::map<unsigned, unsigned> configuration;
     } addons;
+
+    struct
+    {
+        std::map<std::string, CampaignMissionStatus> campaignStatus;
+    } campaigns;
 
     static const std::array<short, 13> SCREEN_REFRESH_RATES;
 

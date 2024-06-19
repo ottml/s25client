@@ -61,6 +61,7 @@ namespace resources {
     constexpr auto carrier = "<RTTR_GAME>/DATA/BOBS/CARRIER.BOB";
     constexpr auto config = "<RTTR_USERDATA>/CONFIG.INI"; // main config file
     constexpr auto ingameOptions = "<RTTR_USERDATA>/IngameOptions.ini";
+    constexpr auto campaignProgress = "<RTTR_USERDATA>/CampaignProgress.ini";
     constexpr auto io = "<RTTR_GAME>/DATA/IO/IO.DAT";
     constexpr auto jobs = "<RTTR_GAME>/DATA/BOBS/JOBS.BOB";
     constexpr auto mis0bobs = "<RTTR_GAME>/DATA/MIS0BOBS.LST";
