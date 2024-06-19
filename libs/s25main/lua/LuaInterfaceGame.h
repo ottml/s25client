@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CampaignProgress.h"
 #include "LuaInterfaceGameBase.h"
 #include "gameTypes/MapCoordinates.h"
 #include "gameTypes/PactTypes.h"
@@ -50,6 +51,8 @@ public:
     unsigned GetGF() const;
     std::string FormatNumGFs(unsigned numGFs) const;
     unsigned GetNumPlayers() const;
+    void EnableMission(unsigned missionIdx);
+    void FinishMission(unsigned missionIdx);
     void Chat(int playerIdx, const std::string& msg);
     void MissionStatement(int playerIdx, const std::string& title, const std::string& msg);
     void MissionStatement2(int playerIdx, const std::string& title, const std::string& msg, unsigned imgIdx);
@@ -60,6 +63,7 @@ public:
     void PostMessageWithLocation(int playerIdx, const std::string& msg, int x, int y);
 
 private:
+    CampaignProgress campaignProgress;
     ILocalGameState& localGameState;
     GameWorld& gw;
     Game& game;

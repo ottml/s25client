@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "LuaInterfaceGame.h"
+#include "CampaignProgress.h"
 #include "EventManager.h"
 #include "Game.h"
 #include "WindowManager.h"
@@ -12,6 +13,7 @@
 #include "lua/LuaHelpers.h"
 #include "lua/LuaPlayer.h"
 #include "lua/LuaWorld.h"
+#include "network/GameClient.h"
 #include "postSystem/PostMsg.h"
 #include "world/GameWorld.h"
 #include "gameTypes/Resource.h"
@@ -19,7 +21,8 @@
 #include "s25util/strAlgos.h"
 
 LuaInterfaceGame::LuaInterfaceGame(Game& gameInstance, ILocalGameState& localGameState)
-    : LuaInterfaceGameBase(localGameState), localGameState(localGameState), gw(gameInstance.world_), game(gameInstance)
+    : LuaInterfaceGameBase(localGameState), campaignProgress(GAMECLIENT.GetCampaignFilePath()),
+      localGameState(localGameState), gw(gameInstance.world_), game(gameInstance)
 {
 #pragma region ConstDefs
 #define ADD_LUA_CONST(name) lua["BLD_" + s25util::toUpper(#name)] = BuildingType::name
@@ -194,6 +197,8 @@ void LuaInterfaceGame::Register(kaguya::State& state)
                                  .addFunction("FormatNumGFs", &LuaInterfaceGame::FormatNumGFs)
                                  .addFunction("GetGameFrame", &LuaInterfaceGame::GetGF)
                                  .addFunction("GetNumPlayers", &LuaInterfaceGame::GetNumPlayers)
+                                 .addFunction("EnableMission", &LuaInterfaceGame::EnableMission)
+                                 .addFunction("FinishMission", &LuaInterfaceGame::FinishMission)
                                  .addFunction("Chat", &LuaInterfaceGame::Chat)
                                  .addOverloadedFunctions("MissionStatement", &LuaInterfaceGame::MissionStatement,
                                                          &LuaInterfaceGame::MissionStatement2,
@@ -261,6 +266,16 @@ std::string LuaInterfaceGame::FormatNumGFs(unsigned numGFs) const
 unsigned LuaInterfaceGame::GetNumPlayers() const
 {
     return gw.GetNumPlayers();
+}
+
+void LuaInterfaceGame::EnableMission(unsigned missionIdx)
+{
+    campaignProgress.EnableMission(missionIdx);
+}
+
+void LuaInterfaceGame::FinishMission(unsigned missionIdx)
+{
+    campaignProgress.FinishMission(missionIdx);
 }
 
 void LuaInterfaceGame::Chat(int playerIdx, const std::string& msg)
