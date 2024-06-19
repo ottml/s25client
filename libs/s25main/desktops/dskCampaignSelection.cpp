@@ -136,7 +136,7 @@ void dskCampaignSelection::Msg_TableSelectItem(const unsigned ctrl_id, const boo
                 auto* mapSelection =
                   AddMapSelection(ID_MapSelection, DrawPoint(secondColumnOffsetX, getColumnOffsetY()),
                                   Extent(secondColumnExtentX, campaignImageExtentY), desc.selectionMapData.value());
-                mapSelection->setMissionsStatus(std::vector<MissionStatus>(desc.getNumMaps(), {true, true}));
+                mapSelection->setMissionsStatus(getMissionStatusFromSettings(campaignFolder));
                 mapSelection->setPreview(true);
             }
 

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "ctrlMapSelection.h"
+#include "CampaignProgress.h"
 #include "CollisionDetection.h"
 #include "Loader.h"
 #include "RttrForeachPt.h"
@@ -180,4 +181,15 @@ void ctrlMapSelection::Draw_()
 
     if(!preview && currentSelectionPos.isValid())
         drawImageOnMap(mapImages.marker, currentSelectionPos);
+}
+
+std::vector<MissionStatus> getMissionStatusFromSettings(boost::filesystem::path const& campaignFolder)
+{
+    CampaignProgress campaignProgress(campaignFolder);
+    const auto& enabled = campaignProgress.IsMissionEnabled();
+    const auto& finished = campaignProgress.IsMissionFinished();
+    std::vector<MissionStatus> missionStatus;
+    for(unsigned i = 0; i < enabled.size(); i++)
+        missionStatus.push_back(MissionStatus{enabled[i], finished[i]});
+    return missionStatus;
 }

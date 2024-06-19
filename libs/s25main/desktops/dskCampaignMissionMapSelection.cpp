@@ -47,7 +47,7 @@ dskCampaignMissionMapSelection::dskCampaignMissionMapSelection(CreateServerInfo 
     {
         auto* mapSelection =
           AddMapSelection(ID_MapSelection, DrawPoint(0, 0), Extent(800, 508), settings_->selectionMapData.value());
-        mapSelection->setMissionsStatus(std::vector<MissionStatus>(settings_->getNumMaps(), {true, true}));
+        mapSelection->setMissionsStatus(getMissionStatusFromSettings(campaignFolder_));
     }
 }
 

@@ -19,6 +19,8 @@ struct MissionStatus
     bool conquered = false;
 };
 
+std::vector<MissionStatus> getMissionStatusFromSettings(boost::filesystem::path const& campaignFolder);
+
 class ctrlMapSelection : public Window
 {
 public:

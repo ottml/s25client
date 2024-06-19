@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "dskCampaignMissionSelection.h"
+#include "CampaignProgress.h"
 #include "Loader.h"
 #include "WindowManager.h"
 #include "commonDefines.h"
@@ -96,6 +97,7 @@ void dskCampaignMissionSelection::UpdateMissionPage()
     ctrlGroup* group = AddGroup(ID_GroupStart + currentPage_);
     Extent catBtSize = Extent(300, buttonSize.y);
     DrawPoint curBtPos(250, getStartOffsetMissionButtonsY());
+    CampaignProgress campaignProgress(campaignFolder_);
     for(unsigned int i = 0; i < missionsPerPage_; i++)
     {
         unsigned int missionIndex = currentPage_ * missionsPerPage_ + i;
@@ -114,8 +116,17 @@ void dskCampaignMissionSelection::UpdateMissionPage()
         const libsiedler2::ArchivItem_Map_Header& header =
           checkedCast<const libsiedler2::ArchivItem_Map*>(map[0])->getHeader();
 
-        group->AddTextButton(i, curBtPos, catBtSize, TextureColor::Grey, s25util::ansiToUTF8(header.getName()),
-                             NormalFont);
+        auto button = group->AddTextButton(i * 2, curBtPos, catBtSize, TextureColor::Grey,
+                                           s25util::ansiToUTF8(header.getName()), NormalFont);
+
+        if(campaignProgress.IsMissionFinished(missionIndex))
+            group->AddImage(i * 2 + 1, DrawPoint(curBtPos.x, curBtPos.y + buttonSize.y / 2),
+                            LOADER.GetImageN("io", 232), "Conquered");
+        else if(campaignProgress.IsMissionEnabled(missionIndex))
+            group->AddImage(i * 2 + 1, DrawPoint(curBtPos.x, curBtPos.y + buttonSize.y / 2),
+                            LOADER.GetImageN("io", 231), "Not yet conquered");
+
+        button->SetEnabled(campaignProgress.IsMissionEnabled(missionIndex));
 
         curBtPos.y += catBtSize.y + distanceBetweenMissionButtonsY;
     }
@@ -125,7 +136,7 @@ void dskCampaignMissionSelection::StartServer(const boost::filesystem::path& map
                                               const boost::optional<boost::filesystem::path>& luaPath)
 {
     // Start server
-    if(!GAMECLIENT.HostGame(csi_, {mapPath, MapType::OldMap, luaPath}))
+    if(!GAMECLIENT.HostGame(csi_, {mapPath, MapType::OldMap, luaPath, campaignFolder_}))
     {
         WINDOWMANAGER.Show(std::make_unique<iwMsgbox>(_("Error"), _("Hosting of game not possible"), this,
                                                       MsgboxButton::Ok, MsgboxIcon::ExclamationRed, ID_msgBoxError));
@@ -150,7 +161,7 @@ void dskCampaignMissionSelection::UpdateEnabledStateOfNextPreviousButton()
 
 void dskCampaignMissionSelection::Msg_Group_ButtonClick(unsigned group_id, unsigned ctrl_id)
 {
-    unsigned int missionIndex = (group_id - ID_GroupStart) * missionsPerPage_ + ctrl_id;
+    unsigned int missionIndex = (group_id - ID_GroupStart) * missionsPerPage_ + ctrl_id / 2;
     const bfs::path mapPath = settings_->getMapFilePath(missionIndex);
     const bfs::path luaPath = settings_->getLuaFilePath(missionIndex);
     StartServer(mapPath, luaPath);
