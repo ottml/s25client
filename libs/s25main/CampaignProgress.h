@@ -4,7 +4,6 @@
 
 #pragma once
 #include <boost/filesystem/path.hpp>
-#include "Settings.h"
 
 class CampaignProgress
 {
@@ -18,8 +17,8 @@ public:
     bool IsMissionEnabled(unsigned missionIdx) const;
     bool IsMissionFinished(unsigned missionIdx) const;
 
-private:
-    void resizeIfNeeded(CampaignMissionStatus& status, unsigned newMissionIdx);
+    std::vector<bool> IsMissionEnabled() const;
+    std::vector<bool> IsMissionFinished() const;
 
 private:
     boost::filesystem::path campaignLua_;

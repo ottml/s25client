@@ -4,48 +4,65 @@
 
 #include "CampaignProgress.h"
 #include "Settings.h"
+#include "lua/CampaignDataLoader.h"
+#include "mygettext/mygettext.h"
+#include "gameData/CampaignDescription.h"
 
 CampaignProgress::CampaignProgress(boost::filesystem::path const& campaignFolder)
     : campaignLua_(campaignFolder / "campaign.lua")
 {
+    const auto settings = std::make_unique<CampaignDescription>();
+    CampaignDataLoader loader(*settings, campaignFolder);
+    if(!loader.Load() || settings->getNumMaps() == 0)
+        throw std::runtime_error(_("Campaign info could not be loaded."));
+
+    auto& missionList = SETTINGS.campaigns.campaignStatus[campaignLua_.string()];
+    if(missionList.isEnabled.size() != settings->getNumMaps())
+    {
+        missionList.isEnabled.resize(settings->getNumMaps(), false);
+        missionList.isFinished.resize(settings->getNumMaps(), false);
+    }
+
     // First mission is enabled per default
     EnableMission(0);
 }
 
-void CampaignProgress::resizeIfNeeded(CampaignMissionStatus& status, unsigned newMissionIdx)
-{
-    auto newSize =
-      std::max(status.isFinished.size(), std::max(static_cast<size_t>(newMissionIdx + 1), status.isEnabled.size()));
-    status.isEnabled.resize(newSize, false);
-    status.isFinished.resize(newSize, false);
-}
-
 void CampaignProgress::EnableMission(unsigned missionIdx)
 {
-    auto& missionList = SETTINGS.campaigns.campaignStatus[campaignLua_.string()];
-    resizeIfNeeded(missionList, missionIdx);
-    missionList.isEnabled[missionIdx] = true;
+    auto& missionsEnabled = SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isEnabled;
+    if(missionIdx < missionsEnabled.size())
+        missionsEnabled[missionIdx] = true;
 }
 
 void CampaignProgress::FinishMission(unsigned missionIdx)
 {
-    auto& missionList = SETTINGS.campaigns.campaignStatus[campaignLua_.string()];
-    resizeIfNeeded(missionList, missionIdx);
-    missionList.isFinished[missionIdx] = true;
+    auto& missionsFinished = SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isFinished;
+    if(missionIdx < missionsFinished.size())
+        missionsFinished[missionIdx] = true;
 }
 
 bool CampaignProgress::IsMissionEnabled(unsigned missionIdx) const
 {
-    if(SETTINGS.campaigns.campaignStatus.count(campaignLua_.string()) == 0)
-        return false;
-    auto const& missionEnabledList = SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isEnabled;
-    return missionIdx < missionEnabledList.size() ? missionEnabledList[missionIdx] : false;
+    auto& missionsEnabled = SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isEnabled;
+    if(missionIdx < missionsEnabled.size())
+        return missionsEnabled[missionIdx];
+    return false;
 }
 
 bool CampaignProgress::IsMissionFinished(unsigned missionIdx) const
 {
-    if(SETTINGS.campaigns.campaignStatus.count(campaignLua_.string()) == 0)
-        return false;
-    auto const& missionFinishedList = SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isFinished;
-    return missionIdx < missionFinishedList.size() ? missionFinishedList[missionIdx] : false;
+    auto& missionsFinished = SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isFinished;
+    if(missionIdx < missionsFinished.size())
+        return missionsFinished[missionIdx];
+    return false;
+}
+
+std::vector<bool> CampaignProgress::IsMissionEnabled() const
+{
+    return SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isEnabled;
+}
+
+std::vector<bool> CampaignProgress::IsMissionFinished() const
+{
+    return SETTINGS.campaigns.campaignStatus[campaignLua_.string()].isFinished;
 }
