@@ -127,7 +127,7 @@ nofFarmhand::PointQuality nofWinegrower::GetPointQuality(const MapPoint pt) cons
     {
         // Try to "plant" a new grapefield
         // Still enough wares when starting new work (state = Waiting1)?
-        if(!workplace->WaresAvailable() && state == State::Waiting1)
+        if(state == State::Waiting1 && !workplace->WaresAvailable())
             return PointQuality::NotPossible;
 
         // Do not build on road
