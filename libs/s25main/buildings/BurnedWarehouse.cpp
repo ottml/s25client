@@ -7,7 +7,6 @@
 #include "EventManager.h"
 #include "GamePlayer.h"
 #include "SerializedGameData.h"
-#include "WineLoader.h"
 #include "figures/nofPassiveWorker.h"
 #include "pathfinding/PathConditionHuman.h"
 #include "random/Random.h"
@@ -82,9 +81,6 @@ void BurnedWarehouse::HandleEvent(const unsigned /*id*/)
             count = people[job]; // Take all on last round
         else
             count = people[job] / (GO_OUT_PHASES - go_out_phase);
-
-        if(count == 0 && wineaddon::isWineAddonJobType(job))
-            continue;
 
         // Von der vorhandenen Abzahl abziehen
         people[job] -= count;
