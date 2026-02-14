@@ -215,8 +215,8 @@ bool noBaseBuilding::IsConnected() const
     // Harbors are always considered connected via sea
     for(const auto dir : helpers::EnumRange<Direction>{})
     {
-        if((dir != Direction::NorthWest && routes[dir]) || 
-            (this->GetType() == NodalObjectType::Building && this->GetBuildingType() == BuildingType::HarborBuilding))
+        if((dir != Direction::NorthWest && routes[dir])
+           || (this->GetType() == NodalObjectType::Building && this->GetBuildingType() == BuildingType::HarborBuilding))
             return true;
     }
 
