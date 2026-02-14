@@ -13,6 +13,8 @@ template<typename T>
 struct PeopleArray
 {
     helpers::EnumArray<T, Job> people = {};
+    /// Subset of the respective soldier job count that have armor
+    /// Must always be in the range [0,Maximum number of soldiers of this type]
     helpers::EnumArray<T, ArmoredSoldier> armoredSoldiers = {};
 
     const T& operator[](Job job) const { return people[job]; }
