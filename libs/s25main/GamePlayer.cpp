@@ -726,13 +726,7 @@ void GamePlayer::FindCarrierForAllRoads()
 void GamePlayer::FindMaterialForBuildingSites()
 {
     for(noBuildingSite* bldSite : buildings.GetBuildingSites())
-    {
-        // isolated building site?
-        if(!bldSite->IsConnected())
-            continue;
-
         bldSite->OrderConstructionMaterial();
-    }
 }
 
 void GamePlayer::AddJobWanted(const Job job, noRoadNode* workplace)
@@ -810,6 +804,14 @@ void GamePlayer::ToolOrderProcessed(Tool tool)
 
 bool GamePlayer::FindWarehouseForJob(const Job job, noRoadNode& goal) const
 {
+    // Optimization: return early if building is isolated
+    if(goal.GetType() == NodalObjectType::Building || goal.GetType() == NodalObjectType::Buildingsite)
+    {
+        auto* bld = static_cast<noBaseBuilding*>(&goal);
+        if(!bld->IsConnected())
+            return false;
+    }
+
     nobBaseWarehouse* wh = FindWarehouse(goal, FW::HasFigure(job, true), false, false);
 
     if(wh)
@@ -826,9 +828,7 @@ void GamePlayer::FindWarehouseForAllJobs()
 {
     for(auto it = jobs_wanted.begin(); it != jobs_wanted.end();)
     {
-        auto* bld = static_cast<noBaseBuilding*>(it->workplace);
-
-        if(bld->IsConnected() && FindWarehouseForJob(it->job, *it->workplace))
+        if(FindWarehouseForJob(it->job, *it->workplace))
             it = jobs_wanted.erase(it);
         else
             ++it;
@@ -841,9 +841,7 @@ void GamePlayer::FindWarehouseForAllJobs(const Job job)
     {
         if(it->job == job)
         {
-            auto* bld = static_cast<noBaseBuilding*>(it->workplace);
-
-            if(bld->IsConnected() && FindWarehouseForJob(it->job, *it->workplace))
+            if(FindWarehouseForJob(it->job, *it->workplace))
                 it = jobs_wanted.erase(it);
             else
                 ++it;
@@ -1036,6 +1034,10 @@ noBaseBuilding* GamePlayer::FindClientForWare(const Ware& ware)
             // Bei Baustellen die Extraliste abfragen
             for(noBuildingSite* bldSite : buildings.GetBuildingSites())
             {
+                // Optimization: return early if building is isolated
+                if(!bldSite->IsConnected())
+                    continue;
+
                 unsigned points = bldSite->CalcDistributionPoints(gt);
                 if(!points)
                     continue;
@@ -1049,6 +1051,10 @@ noBaseBuilding* GamePlayer::FindClientForWare(const Ware& ware)
             // Für übrige Gebäude
             for(nobUsual* bld : buildings.GetBuildings(bldType))
             {
+                // Optimization: return early if building is isolated
+                if(!bld->IsConnected())
+                    continue;
+
                 unsigned points = bld->CalcDistributionPoints(gt);
                 if(!points)
                     continue; // Ware not needed
@@ -1087,9 +1093,6 @@ noBaseBuilding* GamePlayer::FindClientForWare(const Ware& ware)
 
         // get rid of double building entries. TODO: why are there double entries!?
         if(possibleClient.bld == lastBld)
-            continue;
-
-        if(!possibleClient.bld->IsConnected())
             continue;
 
         lastBld = possibleClient.bld;
@@ -1153,9 +1156,7 @@ nobBaseMilitary* GamePlayer::FindClientForCoin(const Ware& ware) const
     // Militärgebäude durchgehen
     for(nobMilitary* milBld : buildings.GetMilitaryBuildings())
     {
-        unsigned way_points;
-
-        // isolated military bulding?
+        // Optimization: return early if building is isolated
         if(!milBld->IsConnected())
             continue;
 
@@ -1163,6 +1164,8 @@ nobBaseMilitary* GamePlayer::FindClientForCoin(const Ware& ware) const
         // Wenn 0, will er gar keine Münzen (Goldzufuhr gestoppt)
         if(points)
         {
+            unsigned way_points;
+
             // Weg dorthin berechnen
             if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points) != RoadPathDirection::None)
             {
