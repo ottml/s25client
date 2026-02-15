@@ -9,9 +9,6 @@
 #include "JobTypes.h"
 #include "RTTR_Assert.h"
 
-#define ARMORED_ENUM_TO_SOLDIER_ENUM(soldier) \
-    Job(SOLDIER_JOBS[static_cast<uint8_t>(soldier) - static_cast<uint8_t>(ArmoredSoldier::Private)])
-
 /// Struct for wares and people (for HQs, warehouses etc)
 struct Inventory : GoodsAndPeopleArray<unsigned>
 {
@@ -19,12 +16,7 @@ struct Inventory : GoodsAndPeopleArray<unsigned>
     void clear();
     void Add(const GoodType good, unsigned amount = 1) { goods[good] += amount; }
     void Add(const Job job, unsigned amount = 1) { people[job] += amount; }
-    void Add(const ArmoredSoldier soldier, unsigned amount = 1)
-    {
-        RTTR_Assert(armoredSoldiers[soldier] <= people[ARMORED_ENUM_TO_SOLDIER_ENUM(soldier)]);
-        armoredSoldiers[soldier] += amount;
-        RTTR_Assert(armoredSoldiers[soldier] <= people[ARMORED_ENUM_TO_SOLDIER_ENUM(soldier)]);
-    }
+    void Add(const ArmoredSoldier soldier, unsigned amount = 1) { armoredSoldiers[soldier] += amount; }
     void Remove(const GoodType good, unsigned amount = 1)
     {
         RTTR_Assert(goods[good] >= amount);
@@ -38,8 +30,6 @@ struct Inventory : GoodsAndPeopleArray<unsigned>
     void Remove(const ArmoredSoldier soldier, unsigned amount = 1)
     {
         RTTR_Assert(armoredSoldiers[soldier] >= amount);
-        RTTR_Assert(armoredSoldiers[soldier] <= people[ARMORED_ENUM_TO_SOLDIER_ENUM(soldier)]);
         armoredSoldiers[soldier] -= amount;
-        RTTR_Assert(armoredSoldiers[soldier] <= people[ARMORED_ENUM_TO_SOLDIER_ENUM(soldier)]);
     }
 };
