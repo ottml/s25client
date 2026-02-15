@@ -5,6 +5,7 @@
 #pragma once
 
 #include <s25util/warningSuppression.h>
+#include <RTTR_Assert.h>
 #include <array>
 #include <cstdint>
 
@@ -88,4 +89,8 @@ constexpr bool isSoldier(const Job job)
     return job >= Job::Private && job <= Job::General;
 }
 
-ArmoredSoldier jobEnumToAmoredSoldierEnum(Job job);
+inline ArmoredSoldier jobEnumToAmoredSoldierEnum(const Job job)
+{
+    RTTR_Assert(isSoldier(job));
+    return static_cast<ArmoredSoldier>(getSoldierRank(job));
+}
