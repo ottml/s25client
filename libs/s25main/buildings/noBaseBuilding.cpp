@@ -212,7 +212,7 @@ bool noBaseBuilding::IsConnected() const
     const helpers::EnumArray<RoadSegment*, Direction> routes = this->GetFlag()->getRoutes();
 
     // Harbors are always considered connected via sea
-    if (this->GetBuildingType() == BuildingType::HarborBuilding)
+    if(this->GetBuildingType() == BuildingType::HarborBuilding)
         return true;
 
     // Check paths in all directions except back to building
