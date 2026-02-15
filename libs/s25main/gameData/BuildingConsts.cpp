@@ -179,10 +179,9 @@ const helpers::EnumArray<const char*, BuildingType> BUILDING_HELP_STRINGS = {{
                "tanned leather. The armor is then transported "
                "to military buildings to bolster your soldiers "
                "defense. "
-               "A soldier wearing armor can withstand an additional "
-               "hit in battle, but the armor is lost once struck. "
-               "When every soldier in a military building is armored, "
-               "they can sometimes survive a catapult strike."),
+               "An armored soldier can withstand an additional hit "
+               "in battle and sometimes survives a catapult strike, "
+               "but the armor is lost once struck."),
   // Catapult
   gettext_noop("Thanks to its immense strength, "
                "the catapults represents an "
