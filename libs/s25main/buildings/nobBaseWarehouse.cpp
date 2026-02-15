@@ -153,11 +153,9 @@ void nobBaseWarehouse::Serialize(SerializedGameData& sgd) const
         sgd.PushUnsignedInt(inventory.real[i]);
         sgd.PushUnsignedChar(static_cast<uint8_t>(inventorySettings[i]));
     }
-    for(const auto i : helpers::enumRange<ArmoredSoldier>())
-    {
-        sgd.PushUnsignedInt(inventory.visual[i]);
-        sgd.PushUnsignedInt(inventory.real[i]);
-    }
+
+    helpers::pushContainer(sgd, inventory.visual.armoredSoldiers);
+    helpers::pushContainer(sgd, inventory.real.armoredSoldiers);
 }
 
 nobBaseWarehouse::nobBaseWarehouse(SerializedGameData& sgd, const unsigned obj_id) : nobBaseMilitary(sgd, obj_id)
@@ -208,11 +206,8 @@ nobBaseWarehouse::nobBaseWarehouse(SerializedGameData& sgd, const unsigned obj_i
     }
     if(sgd.GetGameDataVersion() >= 12)
     {
-        for(const auto i : helpers::enumRange<ArmoredSoldier>())
-        {
-            inventory.visual.armoredSoldiers[i] = sgd.PopUnsignedInt();
-            inventory.real.armoredSoldiers[i] = sgd.PopUnsignedInt();
-        }
+        helpers::popContainer(sgd, inventory.visual.armoredSoldiers);
+        helpers::popContainer(sgd, inventory.real.armoredSoldiers);
     }
 }
 
