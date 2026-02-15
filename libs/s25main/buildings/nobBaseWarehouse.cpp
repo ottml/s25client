@@ -284,7 +284,7 @@ bool nobBaseWarehouse::OrderJob(const Job job, noRoadNode& goal, const bool allo
     std::unique_ptr<noFigure> fig = JobFactory::CreateJob(job, pos, player, goal);
     if(isSoldier(fig->GetJobType()))
     {
-        if(inventory.real.armoredSoldiers[jobEnumToAmoredSoldierEnum(job)] > 0)
+        if(inventory.real[jobEnumToAmoredSoldierEnum(job)] > 0)
         {
             inventory.real.Remove(jobEnumToAmoredSoldierEnum(job));
             fig->SetArmor(true);
@@ -477,7 +477,7 @@ void nobBaseWarehouse::HandleSendoutEvent()
         {
             auto fig = std::make_unique<nofPassiveWorker>(jobType, pos, player, nullptr);
 
-            if(isSoldier(jobType) && inventory.real.armoredSoldiers[jobEnumToAmoredSoldierEnum(jobType)] > 0)
+            if(isSoldier(jobType) && inventory.real[jobEnumToAmoredSoldierEnum(jobType)] > 0)
             {
                 fig->SetArmor(true);
                 inventory.real.Remove(jobEnumToAmoredSoldierEnum(jobType));
@@ -893,7 +893,7 @@ void nobBaseWarehouse::RemoveArmoredFigurFromVisualInventory(noFigure* figure)
     {
         if(figure->HasArmor())
         {
-            RTTR_Assert(inventory.visual.armoredSoldiers[jobEnumToAmoredSoldierEnum(figure->GetJobType())] > 0);
+            RTTR_Assert(inventory.visual[jobEnumToAmoredSoldierEnum(figure->GetJobType())] > 0);
             inventory.visual.Remove(jobEnumToAmoredSoldierEnum(figure->GetJobType()));
         }
     }
@@ -974,7 +974,7 @@ void nobBaseWarehouse::OrderTroops(nobMilitary& goal, std::array<unsigned, NUM_S
         {
             auto soldier = std::make_unique<nofPassiveSoldier>(pos, player, &goal, &goal, i - 1);
             inventory.real.Remove(curRank);
-            if(inventory.real.armoredSoldiers[jobEnumToAmoredSoldierEnum(curRank)] > 0)
+            if(inventory.real[jobEnumToAmoredSoldierEnum(curRank)] > 0)
             {
                 inventory.real.Remove(jobEnumToAmoredSoldierEnum(curRank));
                 soldier->SetArmor(true);
@@ -1005,7 +1005,7 @@ nofAggressiveDefender* nobBaseWarehouse::SendAggressiveDefender(nofAttacker& att
     auto soldier = std::make_unique<nofAggressiveDefender>(pos, player, *this, rank - 1, attacker);
     nofAggressiveDefender& soldierRef = *soldier;
     inventory.real.Remove(SOLDIER_JOBS[rank - 1]);
-    if(inventory.real.armoredSoldiers[jobEnumToAmoredSoldierEnum(soldier->GetJobType())] > 0)
+    if(inventory.real[jobEnumToAmoredSoldierEnum(soldier->GetJobType())] > 0)
     {
         soldier->SetArmor(true);
         inventory.real.Remove(jobEnumToAmoredSoldierEnum(soldier->GetJobType()));
@@ -1089,7 +1089,7 @@ std::unique_ptr<nofDefender> nobBaseWarehouse::ProvideDefender(nofAttacker& atta
                     // diesen Soldaten wollen wir
                     auto defender = std::make_unique<nofDefender>(pos, player, *this, i, attacker);
                     inventory.real.Remove(SOLDIER_JOBS[i]);
-                    if(inventory.real.armoredSoldiers[jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i])] > 0)
+                    if(inventory.real[jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i])] > 0)
                     {
                         defender->SetArmor(true);
                         inventory.real.Remove(jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i]));
@@ -1532,7 +1532,7 @@ void nobBaseWarehouse::StartTradeCaravane(const boost_variant2<GoodType, Job>& w
         if(isSoldierType)
         {
             auto const job = get<1>(what);
-            if(inventory.real.armoredSoldiers[jobEnumToAmoredSoldierEnum(job)] > 0)
+            if(inventory.real[jobEnumToAmoredSoldierEnum(job)] > 0)
             {
                 next->SetArmor(true);
                 inventory.real.Remove(jobEnumToAmoredSoldierEnum(job), 1);
