@@ -207,6 +207,23 @@ MapPoint noBaseBuilding::GetFlagPos() const
     return world->GetNeighbour(pos, Direction::SouthEast);
 }
 
+bool noBaseBuilding::IsConnected() const
+{
+    // Harbors are always considered connected via sea
+    if(GetBuildingType() == BuildingType::HarborBuilding)
+        return true;
+
+    const helpers::EnumArray<RoadSegment*, Direction>& routes = GetFlag()->getRoutes();
+    // Check paths in all directions except back to building
+    for(const auto dir : helpers::EnumRange<Direction>{})
+    {
+        if(dir != Direction::NorthWest && routes[dir])
+            return true;
+    }
+
+    return false;
+}
+
 void noBaseBuilding::WareNotNeeded(Ware* ware)
 {
     if(!ware)

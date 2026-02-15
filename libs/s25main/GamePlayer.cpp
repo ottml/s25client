@@ -804,6 +804,13 @@ void GamePlayer::ToolOrderProcessed(Tool tool)
 
 bool GamePlayer::FindWarehouseForJob(const Job job, noRoadNode& goal) const
 {
+    // Optimization: return early if building is isolated
+    if(goal.GetType() == NodalObjectType::Building || goal.GetType() == NodalObjectType::Buildingsite)
+    {
+        if(!static_cast<noBaseBuilding&>(goal).IsConnected())
+            return false;
+    }
+
     nobBaseWarehouse* wh = FindWarehouse(goal, FW::HasFigure(job, true), false, false);
 
     if(wh)
@@ -1026,6 +1033,10 @@ noBaseBuilding* GamePlayer::FindClientForWare(const Ware& ware)
             // Bei Baustellen die Extraliste abfragen
             for(noBuildingSite* bldSite : buildings.GetBuildingSites())
             {
+                // Optimization: Ignore if unconnected
+                if(!bldSite->IsConnected())
+                    continue;
+
                 unsigned points = bldSite->CalcDistributionPoints(gt);
                 if(!points)
                     continue;
@@ -1039,6 +1050,10 @@ noBaseBuilding* GamePlayer::FindClientForWare(const Ware& ware)
             // Für übrige Gebäude
             for(nobUsual* bld : buildings.GetBuildings(bldType))
             {
+                // Optimization: Ignore if unconnected
+                if(!bld->IsConnected())
+                    continue;
+
                 unsigned points = bld->CalcDistributionPoints(gt);
                 if(!points)
                     continue; // Ware not needed
@@ -1140,12 +1155,16 @@ nobBaseMilitary* GamePlayer::FindClientForCoin(const Ware& ware) const
     // Militärgebäude durchgehen
     for(nobMilitary* milBld : buildings.GetMilitaryBuildings())
     {
-        unsigned way_points;
+        // Optimization: Ignore if unconnected
+        if(!milBld->IsConnected())
+            continue;
 
         points = milBld->CalcCoinsPoints();
         // Wenn 0, will er gar keine Münzen (Goldzufuhr gestoppt)
         if(points)
         {
+            unsigned way_points;
+
             // Weg dorthin berechnen
             if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points) != RoadPathDirection::None)
             {

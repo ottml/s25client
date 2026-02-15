@@ -148,6 +148,10 @@ void noBuildingSite::OrderConstructionMaterial()
     if(state == BuildingSiteState::Planing)
         return;
 
+    // Optimization: return early if building is isolated
+    if(!IsConnected())
+        return;
+
     // Bretter
     GamePlayer& owner = world->GetPlayer(player);
     for(int i = used_boards + boards + ordered_boards.size(); i < BUILDING_COSTS[bldType_].boards; ++i)
