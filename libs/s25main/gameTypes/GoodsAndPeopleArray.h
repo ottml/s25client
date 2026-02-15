@@ -20,7 +20,6 @@ struct PeopleArray
     const T& operator[](Job job) const { return people[job]; }
     T& operator[](Job job) { return people[job]; }
     const T& operator[](ArmoredSoldier soldier) const { return armoredSoldiers[soldier]; }
-    T& operator[](ArmoredSoldier soldier) { return armoredSoldiers[soldier]; }
 };
 
 /// Combined array for goods and people with typed accessors

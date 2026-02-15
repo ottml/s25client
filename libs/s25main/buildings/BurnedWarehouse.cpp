@@ -114,7 +114,7 @@ void BurnedWarehouse::HandleEvent(const unsigned /*id*/)
                     if(people[armoredSoldier] > 0)
                     {
                         figure.SetArmor(true);
-                        people[armoredSoldier]--;
+                        people.armoredSoldiers[armoredSoldier]--;
                     }
                 }
                 figure.StartWandering(GetObjId());

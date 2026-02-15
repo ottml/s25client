@@ -210,8 +210,8 @@ nobBaseWarehouse::nobBaseWarehouse(SerializedGameData& sgd, const unsigned obj_i
     {
         for(const auto i : helpers::enumRange<ArmoredSoldier>())
         {
-            inventory.visual[i] = sgd.PopUnsignedInt();
-            inventory.real[i] = sgd.PopUnsignedInt();
+            inventory.visual.armoredSoldiers[i] = sgd.PopUnsignedInt();
+            inventory.real.armoredSoldiers[i] = sgd.PopUnsignedInt();
         }
     }
 }

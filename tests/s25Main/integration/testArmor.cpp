@@ -21,7 +21,7 @@ struct ArmoredSoldierFixture : public WorldWithGCExecution3P
             Inventory newGoods;
             for(auto soldier : SOLDIER_JOBS)
             {
-                newGoods[jobEnumToAmoredSoldierEnum(soldier)] = 2u;
+                newGoods.armoredSoldiers[jobEnumToAmoredSoldierEnum(soldier)] = 2u;
                 newGoods.people[soldier] = 3u;
                 curWh->SetRealReserve(getSoldierRank(soldier), 0);
                 curWh->SetReserveVisual(getSoldierRank(soldier), 0);
