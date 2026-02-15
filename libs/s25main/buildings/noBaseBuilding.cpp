@@ -209,12 +209,11 @@ MapPoint noBaseBuilding::GetFlagPos() const
 
 bool noBaseBuilding::IsConnected() const
 {
-    const helpers::EnumArray<RoadSegment*, Direction> routes = this->GetFlag()->getRoutes();
-
     // Harbors are always considered connected via sea
-    if(this->GetBuildingType() == BuildingType::HarborBuilding)
+    if(GetBuildingType() == BuildingType::HarborBuilding)
         return true;
 
+    const helpers::EnumArray<RoadSegment*, Direction>& routes = GetFlag()->getRoutes();
     // Check paths in all directions except back to building
     for(const auto dir : helpers::EnumRange<Direction>{})
     {

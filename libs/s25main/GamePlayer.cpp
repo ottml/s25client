@@ -807,8 +807,7 @@ bool GamePlayer::FindWarehouseForJob(const Job job, noRoadNode& goal) const
     // Optimization: return early if building is isolated
     if(goal.GetType() == NodalObjectType::Building || goal.GetType() == NodalObjectType::Buildingsite)
     {
-        auto* bld = static_cast<noBaseBuilding*>(&goal);
-        if(!bld->IsConnected())
+        if(!static_cast<noBaseBuilding&>(goal).IsConnected())
             return false;
     }
 
@@ -1034,7 +1033,7 @@ noBaseBuilding* GamePlayer::FindClientForWare(const Ware& ware)
             // Bei Baustellen die Extraliste abfragen
             for(noBuildingSite* bldSite : buildings.GetBuildingSites())
             {
-                // Optimization: return early if building is isolated
+                // Optimization: Ignore if unconnected
                 if(!bldSite->IsConnected())
                     continue;
 
@@ -1051,7 +1050,7 @@ noBaseBuilding* GamePlayer::FindClientForWare(const Ware& ware)
             // Für übrige Gebäude
             for(nobUsual* bld : buildings.GetBuildings(bldType))
             {
-                // Optimization: return early if building is isolated
+                // Optimization: Ignore if unconnected
                 if(!bld->IsConnected())
                     continue;
 
@@ -1156,7 +1155,7 @@ nobBaseMilitary* GamePlayer::FindClientForCoin(const Ware& ware) const
     // Militärgebäude durchgehen
     for(nobMilitary* milBld : buildings.GetMilitaryBuildings())
     {
-        // Optimization: return early if building is isolated
+        // Optimization: Ignore if unconnected
         if(!milBld->IsConnected())
             continue;
 
