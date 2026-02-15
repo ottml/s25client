@@ -149,7 +149,7 @@ void noBuildingSite::OrderConstructionMaterial()
         return;
 
     // Optimization: return early if building is isolated
-    if(!this->IsConnected())
+    if(!IsConnected())
         return;
 
     // Bretter
