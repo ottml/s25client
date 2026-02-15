@@ -1208,12 +1208,12 @@ void nobBaseWarehouse::AddGoods(const Inventory& goods, bool addToPlayer)
 
     for(const auto i : helpers::enumRange<ArmoredSoldier>())
     {
-        if(!goods.armoredSoldiers[i])
+        if(!goods[i])
             continue;
 
-        inventory.Add(i, goods.armoredSoldiers[i]);
+        inventory.Add(i, goods[i]);
         if(addToPlayer)
-            owner.IncreaseInventoryJob(i, goods.armoredSoldiers[i]);
+            owner.IncreaseInventoryJob(i, goods[i]);
     }
 
     for(const auto i : helpers::enumRange<Job>())
