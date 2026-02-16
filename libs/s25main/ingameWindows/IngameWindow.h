@@ -100,6 +100,8 @@ public:
 
     bool Msg_LeftDown(const MouseCoords&) override;
     bool Msg_LeftUp(const MouseCoords&) override;
+    bool Msg_MiddleDown(const MouseCoords&) override;
+    bool Msg_MiddleUp(const MouseCoords&) override;
     bool Msg_MouseMove(const MouseCoords&) override;
 
 protected:

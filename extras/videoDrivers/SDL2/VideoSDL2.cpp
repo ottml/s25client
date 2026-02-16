@@ -402,6 +402,11 @@ bool VideoSDL2::MessageLoop()
                     mouse_xy.rdown = true;
                     CallBack->Msg_RightDown(mouse_xy);
                 }
+                if(ev.button.button == SDL_BUTTON_MIDDLE)
+                {
+                    mouse_xy.mdown = true;
+                    CallBack->Msg_MiddleDown(mouse_xy);
+                }
                 break;
             case SDL_MOUSEBUTTONUP:
                 mouse_xy.pos = getGuiScale().screenToView(Position(ev.button.x, ev.button.y));
@@ -415,6 +420,11 @@ bool VideoSDL2::MessageLoop()
                 {
                     mouse_xy.rdown = false;
                     CallBack->Msg_RightUp(mouse_xy);
+                }
+                if(ev.button.button == SDL_BUTTON_MIDDLE)
+                {
+                    mouse_xy.mdown = false;
+                    CallBack->Msg_MiddleUp(mouse_xy);
                 }
                 break;
             case SDL_MOUSEWHEEL:

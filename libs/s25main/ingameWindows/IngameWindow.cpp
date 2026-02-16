@@ -263,6 +263,20 @@ bool IngameWindow::Msg_LeftUp(const MouseCoords& mc)
     return false;
 }
 
+bool IngameWindow::Msg_MiddleDown(const MouseCoords& mc)
+{
+    isMoving = true;
+    snapOffset_ = SnapOffset::all(0);
+    lastMousePos = mc.pos;
+    return true;
+}
+
+bool IngameWindow::Msg_MiddleUp(const MouseCoords&)
+{
+    isMoving = false;
+    return false;
+}
+
 bool IngameWindow::Msg_MouseMove(const MouseCoords& mc)
 {
     if(isMoving)
