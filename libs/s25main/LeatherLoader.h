@@ -17,17 +17,17 @@ class GameWorldBase;
 
 namespace leatheraddon {
 
-inline bool isLeatherAddonBuildingType(BuildingType bld)
+constexpr bool isLeatherAddonBuildingType(BuildingType bld)
 {
     return bld == BuildingType::Skinner || bld == BuildingType::Tannery || bld == BuildingType::LeatherWorks;
 }
 
-inline bool isLeatherAddonGoodType(GoodType good)
+constexpr bool isLeatherAddonGoodType(GoodType good)
 {
     return good == GoodType::Skins || good == GoodType::Leather || good == GoodType::Armor;
 }
 
-inline bool isLeatherAddonJobType(Job job)
+constexpr bool isLeatherAddonJobType(Job job)
 {
     return job == Job::Skinner || job == Job::Tanner || job == Job::LeatherWorker;
 }

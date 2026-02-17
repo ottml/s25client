@@ -349,9 +349,9 @@ void nofActiveSoldier::InformTargetsAboutCancelling()
 
 void nofActiveSoldier::TakeHit()
 {
-    if(armor)
+    if(hasArmor_)
     {
-        armor = false;
+        hasArmor_ = false;
         world->GetPlayer(player).DecreaseInventoryJob(jobEnumToAmoredSoldierEnum(GetJobType()), 1);
     } else
     {

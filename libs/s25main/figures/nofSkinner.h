@@ -10,10 +10,6 @@ class SerializedGameData;
 class nobUsual;
 class noAnimal;
 
-#ifdef _MSC_VER
-#    pragma warning(disable : 4646) // function declared with [[noreturn]] has non-void return type
-#endif
-
 class nofSkinner : public nofWorkman
 {
     /// animal, which is skinned

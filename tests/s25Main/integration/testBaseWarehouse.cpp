@@ -292,10 +292,10 @@ BOOST_FIXTURE_TEST_CASE(AddSoldierWithArmor, EmptyWorldFixture1P)
     soldierWithArmor->SetArmor(true);
 
     hq->AddFigure(std::move(soldierWithArmor));
-    BOOST_TEST_REQUIRE(hq->GetNumRealArmoredFigures(ArmoredSoldier::Sergeant) == 1);
-    BOOST_TEST_REQUIRE(hq->GetNumVisualArmoredFigures(ArmoredSoldier::Sergeant) == 1);
-    BOOST_TEST_REQUIRE(hq->GetNumRealWares(GoodType::Armor) == 0);
-    BOOST_TEST_REQUIRE(hq->GetNumVisualWares(GoodType::Armor) == 0);
+    BOOST_TEST(hq->GetNumRealArmoredFigures(ArmoredSoldier::Sergeant) == 1);
+    BOOST_TEST(hq->GetNumVisualArmoredFigures(ArmoredSoldier::Sergeant) == 1);
+    BOOST_TEST(hq->GetNumRealWares(GoodType::Armor) == 0);
+    BOOST_TEST(hq->GetNumVisualWares(GoodType::Armor) == 0);
 }
 
 BOOST_FIXTURE_TEST_CASE(CheckReserveSoldierWithArmor, EmptyWorldFixture1P)
@@ -309,23 +309,23 @@ BOOST_FIXTURE_TEST_CASE(CheckReserveSoldierWithArmor, EmptyWorldFixture1P)
     soldierWithArmor->SetArmor(true);
 
     hq->AddFigure(std::move(soldierWithArmor));
-    BOOST_TEST_REQUIRE(hq->GetNumRealArmoredFigures(ArmoredSoldier::Sergeant) == 0);
-    BOOST_TEST_REQUIRE(hq->GetNumVisualArmoredFigures(ArmoredSoldier::Sergeant) == 0);
-    BOOST_TEST_REQUIRE(hq->GetNumRealFigures(Job::Sergeant) == 0);
-    BOOST_TEST_REQUIRE(hq->GetNumVisualFigures(Job::Sergeant) == 0);
-    BOOST_TEST_REQUIRE(*hq->GetReserveAvailablePointer(getSoldierRank(Job::Sergeant)) == 1);
-    BOOST_TEST_REQUIRE(*hq->GetReserveArmoredAvailablePointer(getSoldierRank(Job::Sergeant)) == 1);
-    BOOST_TEST_REQUIRE(hq->GetNumRealWares(GoodType::Armor) == 0);
-    BOOST_TEST_REQUIRE(hq->GetNumVisualWares(GoodType::Armor) == 0);
+    BOOST_TEST(hq->GetNumRealArmoredFigures(ArmoredSoldier::Sergeant) == 0);
+    BOOST_TEST(hq->GetNumVisualArmoredFigures(ArmoredSoldier::Sergeant) == 0);
+    BOOST_TEST(hq->GetNumRealFigures(Job::Sergeant) == 0);
+    BOOST_TEST(hq->GetNumVisualFigures(Job::Sergeant) == 0);
+    BOOST_TEST(*hq->GetReserveAvailablePointer(getSoldierRank(Job::Sergeant)) == 1);
+    BOOST_TEST(*hq->GetReserveArmoredAvailablePointer(getSoldierRank(Job::Sergeant)) == 1);
+    BOOST_TEST(hq->GetNumRealWares(GoodType::Armor) == 0);
+    BOOST_TEST(hq->GetNumVisualWares(GoodType::Armor) == 0);
 
     // free reserve
     for(unsigned i = 0; i <= this->ggs.GetMaxMilitaryRank(); ++i)
         player.GetFirstWH()->SetRealReserve(i, 0);
 
-    BOOST_TEST_REQUIRE(hq->GetNumRealArmoredFigures(ArmoredSoldier::Sergeant) == 1);
-    BOOST_TEST_REQUIRE(hq->GetNumVisualArmoredFigures(ArmoredSoldier::Sergeant) == 1);
-    BOOST_TEST_REQUIRE(hq->GetNumRealFigures(Job::Sergeant) == 1);
-    BOOST_TEST_REQUIRE(hq->GetNumVisualFigures(Job::Sergeant) == 1);
-    BOOST_TEST_REQUIRE(*hq->GetReserveAvailablePointer(getSoldierRank(Job::Sergeant)) == 0);
-    BOOST_TEST_REQUIRE(*hq->GetReserveArmoredAvailablePointer(getSoldierRank(Job::Sergeant)) == 0);
+    BOOST_TEST(hq->GetNumRealArmoredFigures(ArmoredSoldier::Sergeant) == 1);
+    BOOST_TEST(hq->GetNumVisualArmoredFigures(ArmoredSoldier::Sergeant) == 1);
+    BOOST_TEST(hq->GetNumRealFigures(Job::Sergeant) == 1);
+    BOOST_TEST(hq->GetNumVisualFigures(Job::Sergeant) == 1);
+    BOOST_TEST(*hq->GetReserveAvailablePointer(getSoldierRank(Job::Sergeant)) == 0);
+    BOOST_TEST(*hq->GetReserveArmoredAvailablePointer(getSoldierRank(Job::Sergeant)) == 0);
 }

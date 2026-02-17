@@ -88,24 +88,23 @@ struct ArmorTradeFixture : public ArmoredSoldierFixture
             auto const& globalInventoryPlayer = world.GetPlayer(i).GetInventory();
             for(unsigned i = 0; i < NUM_SOLDIER_RANKS; i++)
             {
-                BOOST_TEST_REQUIRE(playerWh->GetNumRealArmoredFigures(jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i]))
-                                   == globalInventoryPlayer[jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i])]);
-                BOOST_TEST_REQUIRE(playerWh->GetNumRealFigures(SOLDIER_JOBS[i])
-                                   == globalInventoryPlayer[SOLDIER_JOBS[i]]);
+                BOOST_TEST(playerWh->GetNumRealArmoredFigures(jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i]))
+                           == globalInventoryPlayer[jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i])]);
+                BOOST_TEST(playerWh->GetNumRealFigures(SOLDIER_JOBS[i]) == globalInventoryPlayer[SOLDIER_JOBS[i]]);
             }
         }
     }
 
     void testExpectedFigures() const
     {
-        BOOST_TEST_REQUIRE(curWh->GetNumRealFigures(Job::Helper) == numHelpers);
-        BOOST_TEST_REQUIRE(curWh->GetNumRealFigures(Job::PackDonkey) == numDonkeys);
+        BOOST_TEST(curWh->GetNumRealFigures(Job::Helper) == numHelpers);
+        BOOST_TEST(curWh->GetNumRealFigures(Job::PackDonkey) == numDonkeys);
 
         for(unsigned i = 0; i < NUM_SOLDIER_RANKS; i++)
         {
-            BOOST_TEST_REQUIRE(curWh->GetNumRealArmoredFigures(jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i]))
-                               == numArmoredSoldiers[i]);
-            BOOST_TEST_REQUIRE(curWh->GetNumRealFigures(SOLDIER_JOBS[i]) == numSoldiers[i]);
+            BOOST_TEST(curWh->GetNumRealArmoredFigures(jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i]))
+                       == numArmoredSoldiers[i]);
+            BOOST_TEST(curWh->GetNumRealFigures(SOLDIER_JOBS[i]) == numSoldiers[i]);
         }
         testExpectedFiguresInGlobalInventoryMatchWithHQInventory();
     }
@@ -116,17 +115,17 @@ struct ArmorTradeFixture : public ArmoredSoldierFixture
         RTTR_EXEC_TILL(30 * (numTradeItems + 1), curWh->GetLeavingFigures().empty());
         // Real count should not be changed
         // But helpers can be produced in the meantime
-        BOOST_TEST_REQUIRE(curWh->GetNumRealFigures(Job::Helper) >= numHelpers);
+        BOOST_TEST(curWh->GetNumRealFigures(Job::Helper) >= numHelpers);
         numHelpers = curWh->GetNumRealFigures(Job::Helper);
         testExpectedFigures();
         // Visual count should match real count
-        BOOST_TEST_REQUIRE(curWh->GetNumVisualFigures(Job::Helper) == numHelpers);
-        BOOST_TEST_REQUIRE(curWh->GetNumVisualFigures(Job::PackDonkey) == numDonkeys);
+        BOOST_TEST(curWh->GetNumVisualFigures(Job::Helper) == numHelpers);
+        BOOST_TEST(curWh->GetNumVisualFigures(Job::PackDonkey) == numDonkeys);
         for(unsigned i = 0; i < NUM_SOLDIER_RANKS; i++)
         {
-            BOOST_TEST_REQUIRE(curWh->GetNumVisualArmoredFigures(jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i]))
-                               == numArmoredSoldiers[i]);
-            BOOST_TEST_REQUIRE(curWh->GetNumVisualFigures(SOLDIER_JOBS[i]) == numSoldiers[i]);
+            BOOST_TEST(curWh->GetNumVisualArmoredFigures(jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[i]))
+                       == numArmoredSoldiers[i]);
+            BOOST_TEST(curWh->GetNumVisualFigures(SOLDIER_JOBS[i]) == numSoldiers[i]);
         }
     }
 };

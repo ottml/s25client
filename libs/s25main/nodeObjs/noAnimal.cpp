@@ -333,8 +333,10 @@ bool noAnimal::IsGettingSkinned() const
 void noAnimal::Skinned()
 {
     if(!hunter)
+    {
         // Remove decay event for animal because skinner has taken it
         GetEvMgr().RemoveEvent(current_ev);
+    }
     // Reset skinner
     skinner = nullptr;
 }

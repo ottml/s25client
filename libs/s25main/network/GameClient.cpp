@@ -1580,9 +1580,7 @@ bool GameClient::StartReplay(const boost::filesystem::path& path)
         }
 
         for(unsigned i = 0; i < game->world_.GetNumPlayers(); i++)
-        {
             game->world_.GetPlayer(i).ChangeDistribution(newDistributions);
-        }
     }
 
     replayinfo->next_gf = replayinfo->replay.ReadGF();

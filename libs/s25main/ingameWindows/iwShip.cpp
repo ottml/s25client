@@ -209,11 +209,8 @@ void iwShip::DrawCargo()
     {
         orderedFigures[figure.GetJobType()]++;
 
-        if(isSoldier(figure.GetJobType()))
-        {
-            if(figure.HasArmor())
-                armoredFigures[jobEnumToAmoredSoldierEnum(figure.GetJobType())]++;
-        }
+        if(isSoldier(figure.GetJobType()) && figure.HasArmor())
+            armoredFigures[jobEnumToAmoredSoldierEnum(figure.GetJobType())]++;
     }
 
     // Count wares by type

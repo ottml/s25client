@@ -209,5 +209,6 @@ void iwDistribution::CreateGroups()
     for(auto& group : groups)
         helpers::erase_if(group.entries, isUnused);
 
+    // Remove groups with only one entry (pigs when leather addon is disabled)
     helpers::erase_if(groups, [](DistributionGroup& group) { return group.entries.size() == 1; });
 }

@@ -51,7 +51,7 @@ noFigure::noFigure(const Job job, const MapPoint pos, const unsigned char player
     : noMovable(NodalObjectType::Figure, pos), fs(FigureState::GotToGoal), job_(job), player(player), cur_rs(nullptr),
       rs_pos(0), rs_dir(false), on_ship(false), goal_(goal), waiting_for_free_node(false), wander_way(0),
       wander_tryings(0), flagPos_(MapPoint::Invalid()), flag_obj_id(0), burned_wh_id(0xFFFFFFFF), last_id(0xFFFFFFFF),
-      armor(false)
+      hasArmor_(false)
 {
     // If the goal is a storehouse we won't work there but go to the new home
     if(goal && nobBaseWarehouse::isStorehouseGOT(goal->GetGOT()))
@@ -62,7 +62,7 @@ noFigure::noFigure(const Job job, const MapPoint pos, const unsigned char player
     : noMovable(NodalObjectType::Figure, pos), fs(FigureState::Job), job_(job), player(player), cur_rs(nullptr),
       rs_pos(0), rs_dir(false), on_ship(false), goal_(nullptr), waiting_for_free_node(false), wander_way(0),
       wander_tryings(0), flagPos_(MapPoint::Invalid()), flag_obj_id(0), burned_wh_id(0xFFFFFFFF), last_id(0xFFFFFFFF),
-      armor(false)
+      hasArmor_(false)
 {}
 
 void noFigure::Destroy()
@@ -85,7 +85,7 @@ void noFigure::Serialize(SerializedGameData& sgd) const
     sgd.PushUnsignedShort(rs_pos);
     sgd.PushBool(rs_dir);
     sgd.PushBool(on_ship);
-    sgd.PushBool(armor);
+    sgd.PushBool(hasArmor_);
 
     if(fs == FigureState::GotToGoal || fs == FigureState::GoHome)
         sgd.PushObject(goal_);
@@ -105,7 +105,7 @@ void noFigure::Serialize(SerializedGameData& sgd) const
 noFigure::noFigure(SerializedGameData& sgd, const unsigned obj_id)
     : noMovable(sgd, obj_id), fs(sgd.Pop<FigureState>()), job_(sgd.Pop<Job>()), player(sgd.PopUnsignedChar()),
       cur_rs(sgd.PopObject<RoadSegment>(GO_Type::Roadsegment)), rs_pos(sgd.PopUnsignedShort()), rs_dir(sgd.PopBool()),
-      on_ship(sgd.PopBool()), last_id(0xFFFFFFFF), armor(sgd.GetGameDataVersion() >= 12 ? sgd.PopBool() : false)
+      on_ship(sgd.PopBool()), last_id(0xFFFFFFFF), hasArmor_(sgd.GetGameDataVersion() >= 12 ? sgd.PopBool() : false)
 {
     if(fs == FigureState::GotToGoal || fs == FigureState::GoHome)
         goal_ = sgd.PopObject<noRoadNode>();
@@ -761,7 +761,7 @@ void noFigure::DrawWalkingBobJobs(DrawPoint drawPt, Job job)
     LOADER.getBobSprite(owner.nation, job, GetCurMoveDir(), ani_step)
       .drawForPlayer(InterpolateWalkDrawPos(drawPt), owner.color);
 
-    if(armor)
+    if(hasArmor_)
         DrawArmor(InterpolateWalkDrawPos(drawPt));
 }
 
@@ -858,11 +858,8 @@ void noFigure::RemoveFromInventory()
     } else
     {
         world->GetPlayer(player).DecreaseInventoryJob(job_, 1);
-        if(isSoldier(GetJobType()))
-        {
-            if(armor)
-                world->GetPlayer(player).DecreaseInventoryJob(jobEnumToAmoredSoldierEnum(GetJobType()), 1);
-        }
+        if(isSoldier(GetJobType()) && hasArmor_)
+            world->GetPlayer(player).DecreaseInventoryJob(jobEnumToAmoredSoldierEnum(GetJobType()), 1);
     }
 }
 

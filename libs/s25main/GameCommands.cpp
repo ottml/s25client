@@ -157,8 +157,10 @@ ChangeBuildOrder::ChangeBuildOrder(Deserializer& ser)
             buildOrder.insert(buildOrder.end(), {BuildingType::Vineyard, BuildingType::Winery, BuildingType::Temple});
 
         if(ser.getDataVersion() < 2)
+        {
             buildOrder.insert(buildOrder.end(),
                               {BuildingType::Skinner, BuildingType::Tannery, BuildingType::LeatherWorks});
+        }
 
         std::generate(buildOrder.begin(), buildOrder.end() - countOfNotAvailableBuildingsInSaveGame,
                       [&]() { return helpers::popEnum<BuildingType>(ser); });
@@ -294,10 +296,10 @@ SetAllInventorySettings::SetAllInventorySettings(Deserializer& ser)
             };
 
             size_t tgtIdx = 0;
-            for(const auto i : helpers::enumRange<Job>())
+            for(const auto job : helpers::enumRange<Job>())
             {
                 // skip over not stored jobs
-                if(!isJobSkipped(i))
+                if(!isJobSkipped(job))
                     states[tgtIdx] = InventorySetting(ser.PopUnsignedChar());
                 tgtIdx++;
             }
@@ -309,10 +311,10 @@ SetAllInventorySettings::SetAllInventorySettings(Deserializer& ser)
             };
 
             size_t tgtIdx = 0;
-            for(const auto i : helpers::enumRange<GoodType>())
+            for(const auto ware : helpers::enumRange<GoodType>())
             {
                 // skip over not stored wares
-                if(!isWareSkipped(i))
+                if(!isWareSkipped(ware))
                     states[tgtIdx] = InventorySetting(ser.PopUnsignedChar());
                 tgtIdx++;
             }

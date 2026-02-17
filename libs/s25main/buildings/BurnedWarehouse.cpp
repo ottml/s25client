@@ -70,10 +70,11 @@ void BurnedWarehouse::HandleEvent(const unsigned /*id*/)
     {
         // No way out for figures -> all die and we can remove this object
         GetEvMgr().AddToKillList(world->RemoveFigure(pos, *this));
+        auto& currentPlayer = world->GetPlayer(player);
         for(const auto i : helpers::enumRange<Job>())
-            world->GetPlayer(player).DecreaseInventoryJob(i, people[i]);
+            currentPlayer.DecreaseInventoryJob(i, people[i]);
         for(const auto i : helpers::enumRange<ArmoredSoldier>())
-            world->GetPlayer(player).DecreaseInventoryJob(i, people[i]);
+            currentPlayer.DecreaseInventoryJob(i, people[i]);
 
         return;
     }
@@ -130,8 +131,10 @@ void BurnedWarehouse::HandleEvent(const unsigned /*id*/)
         // All done
         GetEvMgr().AddToKillList(world->RemoveFigure(pos, *this));
         // There shouldn't be any more
-        for(unsigned int it : people.people)
-            RTTR_Assert(it == 0);
+        for(unsigned int num : people.people)
+            RTTR_Assert(num == 0);
+        for(unsigned int num : people.armoredSoldiers)
+            RTTR_Assert(num == 0);
     } else // Not done yet
         GetEvMgr().AddEvent(this, PHASE_LENGTH, 0);
 }

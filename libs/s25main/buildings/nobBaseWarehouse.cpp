@@ -658,7 +658,7 @@ void nobBaseWarehouse::HandleLeaveEvent()
             } else
                 inventory.visual.Remove(fig.GetJobType());
 
-            RemoveArmoredFigurFromVisualInventory(&fig);
+            RemoveArmoredFigurFromVisualInventory(fig);
 
             if(fig.GetGOT() == GO_Type::NofTradedonkey)
             {
@@ -882,27 +882,19 @@ void nobBaseWarehouse::AddFigure(std::unique_ptr<noFigure> figure, const bool in
     GetEvMgr().AddToKillList(std::move(figure));
 }
 
-void nobBaseWarehouse::RemoveArmoredFigurFromVisualInventory(noFigure* figure)
+void nobBaseWarehouse::RemoveArmoredFigurFromVisualInventory(const noFigure& figure)
 {
-    if(isSoldier(figure->GetJobType()))
+    if(isSoldier(figure.GetJobType()) && figure.HasArmor())
     {
-        if(figure->HasArmor())
-        {
-            RTTR_Assert(inventory.visual[jobEnumToAmoredSoldierEnum(figure->GetJobType())] > 0);
-            inventory.visual.Remove(jobEnumToAmoredSoldierEnum(figure->GetJobType()));
-        }
+        RTTR_Assert(inventory.visual[jobEnumToAmoredSoldierEnum(figure.GetJobType())] > 0);
+        inventory.visual.Remove(jobEnumToAmoredSoldierEnum(figure.GetJobType()));
     }
 }
 
-void nobBaseWarehouse::AddArmoredFigurToVisualInventory(noFigure* figure)
+void nobBaseWarehouse::AddArmoredFigurToVisualInventory(const noFigure& figure)
 {
-    if(isSoldier(figure->GetJobType()))
-    {
-        if(figure->HasArmor())
-        {
-            inventory.visual.Add(jobEnumToAmoredSoldierEnum(figure->GetJobType()));
-        }
-    }
+    if(isSoldier(figure.GetJobType()) && figure.HasArmor())
+        inventory.visual.Add(jobEnumToAmoredSoldierEnum(figure.GetJobType()));
 }
 
 void nobBaseWarehouse::FetchWare()
@@ -1030,7 +1022,7 @@ void nobBaseWarehouse::AddActiveSoldier(std::unique_ptr<nofActiveSoldier> soldie
             inventory.real.Add(jobEnumToAmoredSoldierEnum(soldier->GetJobType()));
     } else
     {
-        inventory.Add(SOLDIER_JOBS[soldier->GetRank()]);
+        inventory.Add(soldier->GetJobType());
         if(soldier->HasArmor())
             inventory.Add(jobEnumToAmoredSoldierEnum(soldier->GetJobType()));
     }
@@ -1201,16 +1193,6 @@ void nobBaseWarehouse::AddGoods(const Inventory& goods, bool addToPlayer)
         CheckUsesForNewWare(i);
     }
 
-    for(const auto i : helpers::enumRange<ArmoredSoldier>())
-    {
-        if(!goods[i])
-            continue;
-
-        inventory.Add(i, goods[i]);
-        if(addToPlayer)
-            owner.IncreaseInventoryJob(i, goods[i]);
-    }
-
     for(const auto i : helpers::enumRange<Job>())
     {
         if(!goods.people[i])
@@ -1221,6 +1203,18 @@ void nobBaseWarehouse::AddGoods(const Inventory& goods, bool addToPlayer)
         inventory.Add(i, goods.people[i]);
         if(addToPlayer)
             owner.IncreaseInventoryJob(i, goods.people[i]);
+
+        if(isSoldier(i))
+        {
+            const auto armoredSoldier = jobEnumToAmoredSoldierEnum(i);
+            if(goods[armoredSoldier])
+            {
+                inventory.Add(armoredSoldier, goods[armoredSoldier]);
+                if(addToPlayer)
+                    owner.IncreaseInventoryJob(armoredSoldier, goods[armoredSoldier]);
+            }
+        }
+
         CheckJobsForNewFigure(i);
     }
 }
@@ -1433,7 +1427,7 @@ void nobBaseWarehouse::RefreshReserve(unsigned rank)
             unsigned add = std::min(inventory[SOLDIER_JOBS[rank]],                                           // möglich
                                     reserve_soldiers_claimed_real[rank] - reserve_soldiers_available[rank]); // nötig
 
-            unsigned armor = std::min(add, inventory[jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[rank])]);
+            const unsigned armor = std::min(add, inventory[jobEnumToAmoredSoldierEnum(SOLDIER_JOBS[rank])]);
 
             // Bei der Reserve hinzufügen
             reserve_soldiers_available[rank] += add;
@@ -1519,14 +1513,14 @@ void nobBaseWarehouse::StartTradeCaravane(const boost_variant2<GoodType, Job>& w
     GamePlayer& owner = world->GetPlayer(player);
 
     // Create the donkeys or other people
-    bool isSoldierType = holds_alternative<Job>(what) && isSoldier(get<1>(what));
+    const bool isSoldierType = holds_alternative<Job>(what) && isSoldier(get<Job>(what));
     nofTradeDonkey* last = nullptr;
     for(unsigned i = 0; i < count; ++i)
     {
         auto next = std::make_unique<nofTradeDonkey>(pos, player, what);
         if(isSoldierType)
         {
-            auto const job = get<1>(what);
+            auto const job = get<Job>(what);
             if(inventory.real[jobEnumToAmoredSoldierEnum(job)] > 0)
             {
                 next->SetArmor(true);

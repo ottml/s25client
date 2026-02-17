@@ -35,7 +35,7 @@ iwMilitaryBuilding::iwMilitaryBuilding(GameWorldView& gwv, GameCommandFactory& g
                    _(BUILDING_NAMES[building->GetBuildingType()]), LOADER.GetImageN("resource", 41)),
       gwv(gwv), gcFactory(gcFactory), building(building)
 {
-    auto addonStatusMilitaryControl = gwv.GetWorld().GetGGS().getSelection(AddonId::MILITARY_CONTROL);
+    const auto addonStatusMilitaryControl = gwv.GetWorld().GetGGS().getSelection(AddonId::MILITARY_CONTROL);
 
     DrawPoint btOffset(0, 0);
     if(addonStatusMilitaryControl == 2)
@@ -178,9 +178,7 @@ void iwMilitaryBuilding::DrawContent()
     for(const auto* soldier : soldiers)
     {
         if(leatheraddon::isAddonActive(gwv.GetWorld()) && soldier->HasArmor())
-        {
             armorWareIcon->DrawFull(curTroopsPos, 0xFFA0A0A0);
-        }
         LOADER.GetMapTexture(2321 + soldier->GetRank())->DrawFull(curTroopsPos);
         curTroopsPos.x += 22;
     }

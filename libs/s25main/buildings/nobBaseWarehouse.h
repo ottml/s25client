@@ -127,8 +127,8 @@ protected:
     /// Recruts a worker of the given job if possible
     bool TryRecruitJob(Job job);
 
-    void RemoveArmoredFigurFromVisualInventory(noFigure* figure);
-    void AddArmoredFigurToVisualInventory(noFigure* figure);
+    void RemoveArmoredFigurFromVisualInventory(const noFigure& figure);
+    void AddArmoredFigurToVisualInventory(const noFigure& figure);
 
     nobBaseWarehouse(BuildingType type, MapPoint pos, unsigned char player, Nation nation);
     nobBaseWarehouse(SerializedGameData& sgd, unsigned obj_id);

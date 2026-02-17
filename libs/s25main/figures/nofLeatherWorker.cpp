@@ -34,13 +34,11 @@ void nofLeatherWorker::DrawWorking(DrawPoint drawPt)
     {
         world->GetSoundMgr().playNOSound(72, *this, now_id, 100);
         was_sounding = true;
-    }
-    // saw sound 1
-    else if(now_id % 23 == 9)
+    } else if(now_id % 23 == 9) // saw sound 1
     {
         world->GetSoundMgr().playNOSound(54, *this, now_id);
         was_sounding = true;
-    } else if(now_id % 23 == 17)
+    } else if(now_id % 23 == 17) // saw sound 2
     {
         world->GetSoundMgr().playNOSound(55, *this, now_id);
         was_sounding = true;
@@ -49,10 +47,19 @@ void nofLeatherWorker::DrawWorking(DrawPoint drawPt)
     last_id = now_id;
 }
 
+#ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4646) // function declared with [[noreturn]] has non-void return type
+#endif
+
 unsigned short nofLeatherWorker::GetCarryID() const
 {
     throw std::logic_error("Must not be called. Handled by custom DrawWalkingWithWare");
 }
+
+#ifdef _MSC_VER
+#    pragma warning(pop)
+#endif
 
 void nofLeatherWorker::DrawWalkingWithWare(DrawPoint drawPt)
 {

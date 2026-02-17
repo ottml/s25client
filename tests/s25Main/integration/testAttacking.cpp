@@ -518,10 +518,9 @@ BOOST_FIXTURE_TEST_CASE(ArmoredSoldierLosesArmorInFight, AttackFixture<>)
     // Lets fight until defender has no armor anymore
     // He should not lose a hitpoint but the armor
     RTTR_EXEC_TILL(1000, milBld1->GetDefender()->HasArmor() == false);
-    BOOST_TEST_REQUIRE(attackedPlInventory[jobEnumToAmoredSoldierEnum(Job::Private)]
-                       == numOldWeakSoldiersWithArmor - 1);
-    BOOST_TEST_REQUIRE(attackedPlInventory.people[Job::Private] == numOldWeakSoldiers);
-    BOOST_TEST_REQUIRE(milBld1->GetDefender()->GetHitpoints() == HITPOINTS[milBld1->GetDefender()->GetRank()]);
+    BOOST_TEST(attackedPlInventory[jobEnumToAmoredSoldierEnum(Job::Private)] == numOldWeakSoldiersWithArmor - 1);
+    BOOST_TEST(attackedPlInventory.people[Job::Private] == numOldWeakSoldiers);
+    BOOST_TEST(milBld1->GetDefender()->GetHitpoints() == HITPOINTS[milBld1->GetDefender()->GetRank()]);
 }
 
 BOOST_FIXTURE_TEST_CASE(ConquerBldCoinAddonEnable, AttackFixture<>)

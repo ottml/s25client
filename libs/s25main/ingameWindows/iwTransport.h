@@ -6,6 +6,7 @@
 
 #include "TransmitSettingsIgwAdapter.h"
 #include "gameTypes/SettingsTypes.h"
+#include <array>
 #include <vector>
 
 class ITexture;

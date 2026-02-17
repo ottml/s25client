@@ -22,7 +22,7 @@ void nofTanner::DrawWorking(DrawPoint drawPt)
 {
     constexpr helpers::EnumArray<DrawPoint, Nation> offsets = {{{28, -14}, {28, -8}, {-14, -22}, {-5, -25}, {17, -35}}};
 
-    unsigned now_id = GAMECLIENT.Interpolate(136, current_ev);
+    const unsigned now_id = GAMECLIENT.Interpolate(136, current_ev);
 
     LOADER
       .GetPlayerImage("leather_bobs",
@@ -32,10 +32,19 @@ void nofTanner::DrawWorking(DrawPoint drawPt)
     last_id = now_id;
 }
 
+#ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4646) // function declared with [[noreturn]] has non-void return type
+#endif
+
 unsigned short nofTanner::GetCarryID() const
 {
     throw std::logic_error("Must not be called. Handled by custom DrawWalkingWithWare");
 }
+
+#ifdef _MSC_VER
+#    pragma warning(pop)
+#endif
 
 void nofTanner::DrawWalkingWithWare(DrawPoint drawPt)
 {

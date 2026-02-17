@@ -256,15 +256,17 @@ void nobMilitary::Draw(DrawPoint drawPt)
     if(leatheraddon::isAddonActive(world->GetPlayer(player).GetGameWorld()))
     {
         if(coinsDisabledVirtual)
+        {
             LOADER.GetImageN("leather_bobs", leatheraddon::bobIndex[leatheraddon::BobType::StopCoinsXSignOverride])
               ->DrawFull(drawPt + BUILDING_SIGN_CONSTS[nation][bldType_]);
+        }
 
         if(!armorAllowedVirtual)
+        {
             LOADER.GetImageN("leather_bobs", leatheraddon::bobIndex[leatheraddon::BobType::StopArmorXSign])
               ->DrawFull(drawPt + BUILDING_ARMOR_SIGN_CONSTS[nation][bldType_]);
-    }
-    // Wenn Goldzufuhr gestoppt ist, Schild außen am Gebäude zeichnen zeichnen
-    else
+        }
+    } else // Without leather addon use original graphic
     {
         if(coinsDisabledVirtual)
             LOADER.GetMapTexture(46)->DrawFull(drawPt + BUILDING_SIGN_CONSTS[nation][bldType_]);
@@ -373,12 +375,12 @@ void nobMilitary::HandleEvent(const unsigned id)
         {
             armor_upgrade_event = nullptr;
 
-            auto canidate = std::find_if(troops.rbegin(), troops.rend(),
-                                         [](OwnedSortedTroops::value_type& troop) { return !troop->HasArmor(); });
+            auto candidate = std::find_if(troops.rbegin(), troops.rend(),
+                                          [](OwnedSortedTroops::value_type& troop) { return !troop->HasArmor(); });
 
-            if(canidate != troops.rend())
+            if(candidate != troops.rend())
             {
-                auto& soldier = *canidate;
+                auto& soldier = *candidate;
                 soldier->SetArmor(true);
 
                 --numArmor;
@@ -688,8 +690,9 @@ void nobMilitary::TakeWare(Ware* ware)
     {
         RTTR_Assert(!helpers::contains(ordered_coins, ware));
         ordered_coins.push_back(ware);
-    } else if(ware->type == GoodType::Armor)
+    } else
     {
+        RTTR_Assert(ware->type == GoodType::Armor);
         RTTR_Assert(!helpers::contains(ordered_armor, ware));
         ordered_armor.push_back(ware);
     }
@@ -711,7 +714,7 @@ void nobMilitary::AddWare(std::unique_ptr<Ware> ware)
 
         // Evtl. Soldaten befördern
         PrepareUpgrading();
-    } else if(ware->type == GoodType::Armor)
+    } else
     {
         ++numArmor;
         RTTR_Assert(helpers::contains(ordered_armor, ware.get()));
@@ -731,7 +734,7 @@ void nobMilitary::WareLost(Ware& ware)
         // Ein Goldstück konnte nicht kommen --> aus der Bestellliste entfernen
         RTTR_Assert(helpers::contains(ordered_coins, &ware));
         ordered_coins.remove(&ware);
-    } else if(ware.type == GoodType::Armor)
+    } else
     {
         RTTR_Assert(helpers::contains(ordered_armor, &ware));
         ordered_armor.remove(&ware);

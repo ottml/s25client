@@ -522,7 +522,7 @@ void nobHarborBuilding::ShipArrived(noShip& ship)
             if(it->dest == ship_dest)
             {
                 inventory.visual.Remove(it->attacker->GetJobType());
-                RemoveArmoredFigurFromVisualInventory(it->attacker.get());
+                RemoveArmoredFigurFromVisualInventory(*it->attacker);
                 attackers.push_back(std::move(it->attacker));
                 it = soldiers_for_ships.erase(it);
             } else
@@ -598,7 +598,7 @@ void nobHarborBuilding::ShipArrived(noShip& ship)
                     if(it->fig->GetJobType() != Job::BoatCarrier)
                     {
                         inventory.visual.Remove(it->fig->GetJobType());
-                        RemoveArmoredFigurFromVisualInventory(it->fig.get());
+                        RemoveArmoredFigurFromVisualInventory(*it->fig);
                     } else
                     {
                         inventory.visual.Remove(Job::Helper);
@@ -877,7 +877,7 @@ void nobHarborBuilding::AddFigureForShip(std::unique_ptr<noFigure> fig, MapPoint
     if(fig->GetJobType() != Job::BoatCarrier)
     {
         inventory.visual.Add(fig->GetJobType());
-        AddArmoredFigurToVisualInventory(fig.get());
+        AddArmoredFigurToVisualInventory(*fig);
     } else
     {
         inventory.visual.Add(Job::Helper);
@@ -1036,7 +1036,7 @@ bool nobHarborBuilding::UseFigureAtOnce(std::unique_ptr<noFigure>& fig, noRoadNo
         if(fig->GetJobType() != Job::BoatCarrier)
         {
             inventory.visual.Remove(fig->GetJobType());
-            RemoveArmoredFigurFromVisualInventory(fig.get());
+            RemoveArmoredFigurFromVisualInventory(*fig);
         } else
         {
             inventory.visual.Remove(Job::Helper);
@@ -1083,7 +1083,7 @@ void nobHarborBuilding::ReceiveGoodsFromShip(std::list<std::unique_ptr<noFigure>
                 } else
                 {
                     inventory.visual.Add(figure->GetJobType());
-                    AddArmoredFigurToVisualInventory(figure.get());
+                    AddArmoredFigurToVisualInventory(*figure);
                 }
                 AddLeavingFigure(std::move(figure));
             } else if(nextDir == RoadPathDirection::Ship)

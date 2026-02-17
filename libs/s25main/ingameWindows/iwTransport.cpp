@@ -113,7 +113,7 @@ void iwTransport::TransmitSettings()
     if(settings_changed)
     {
         TransportOrders transmitPendingTransportOrder;
-        unsigned int i = 0;
+        unsigned i = 0;
         for(; i < pendingOrder.size(); i++)
             transmitPendingTransportOrder[i] = pendingOrder[i];
 
@@ -204,7 +204,7 @@ void iwTransport::Msg_ButtonClick(const unsigned ctrl_id)
             auto* group = GetCtrl<ctrlOptionGroup>(6);
 
             // Wenn wir schon ganz unten sind, gehts nicht weiter runter
-            if(group->GetSelection() < (pendingOrder.size() - 1))
+            if(group->GetSelection() + 1 < pendingOrder.size())
             {
                 std::swap(pendingOrder[group->GetSelection()], pendingOrder[group->GetSelection() + 1]);
                 ctrlImageButton& btPrev = *group->GetCtrl<ctrlImageButton>(group->GetSelection());
@@ -222,7 +222,7 @@ void iwTransport::Msg_ButtonClick(const unsigned ctrl_id)
             auto* group = GetCtrl<ctrlOptionGroup>(6);
 
             // Wenn wir schon ganz unten sind, gehts nicht weiter runter
-            while(group->GetSelection() < (pendingOrder.size() - 1))
+            while(group->GetSelection() + 1 < pendingOrder.size())
             {
                 std::swap(pendingOrder[group->GetSelection()], pendingOrder[group->GetSelection() + 1]);
                 ctrlImageButton& btPrev = *group->GetCtrl<ctrlImageButton>(group->GetSelection());

@@ -39,9 +39,7 @@ void nofSkinner::Serialize(SerializedGameData& sgd) const
     nofBuildingWorker::Serialize(sgd);
 
     if(state != State::FigureWork && state != State::Waiting1)
-    {
         sgd.PushObject(animal, true);
-    }
 }
 
 void nofSkinner::WorkAborted()
@@ -69,10 +67,19 @@ void nofSkinner::AnimalLost()
     }
 }
 
+#ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4646) // function declared with [[noreturn]] has non-void return type
+#endif
+
 unsigned short nofSkinner::GetCarryID() const
 {
     throw std::logic_error("Must not be called. Handled by custom DrawWalkingWithWare");
 }
+
+#ifdef _MSC_VER
+#    pragma warning(pop)
+#endif
 
 void nofSkinner::DrawWalkingWithWare(DrawPoint drawPt)
 {
@@ -156,9 +163,8 @@ void nofSkinner::HandleStateWalkingHome()
     // Search for way if we can go home (add tolerance to avoid dying, if he walked some fields to far away)
     const auto dir = world->FindHumanPath(pos, homeFlagPos, MAX_SKINNING_DISTANCE + MAX_SKINNING_DISTANCE / 4);
     if(dir)
-    {
         StartWalking(*dir);
-    } else
+    else
     {
         // no way to home
         AbrogateWorkplace();
@@ -243,9 +249,8 @@ void nofSkinner::WalkedDerived()
             {
                 const auto dir = world->FindHumanPath(pos, animal->GetPos(), MAX_SKINNING_DISTANCE);
                 if(dir)
-                {
                     StartWalking(*dir);
-                } else
+                else
                 {
                     // no way --> go home
                     StartWalkingHome();

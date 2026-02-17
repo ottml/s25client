@@ -94,3 +94,8 @@ inline ArmoredSoldier jobEnumToAmoredSoldierEnum(const Job job)
     RTTR_Assert(isSoldier(job));
     return static_cast<ArmoredSoldier>(getSoldierRank(job));
 }
+
+inline Job amoredEnumToSoldierEnum(const ArmoredSoldier armoredSoldier)
+{
+    return Job(SOLDIER_JOBS[static_cast<uint8_t>(armoredSoldier) - static_cast<uint8_t>(ArmoredSoldier::Private)]);
+}

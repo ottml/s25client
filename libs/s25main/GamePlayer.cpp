@@ -279,9 +279,7 @@ void GamePlayer::Deserialize(SerializedGameData& sgd)
         // Set standard value otherwise its zero and Slaughterhouse never gets ham
         // because the ham distribution was not there in earlier versions
         if(sgd.GetGameDataVersion() < 12 && i == GoodType::Ham)
-        {
             dist.percent_buildings[BuildingType::Slaughterhouse] = 8;
-        }
 
         if(sgd.GetGameDataVersion() < 7)
         {
@@ -307,12 +305,16 @@ void GamePlayer::Deserialize(SerializedGameData& sgd)
         helpers::popContainer(sgd, build_order_raw, true);
 
         if(sgd.GetGameDataVersion() < 11)
+        {
             build_order_raw.insert(build_order_raw.end(),
                                    {BuildingType::Vineyard, BuildingType::Winery, BuildingType::Temple});
+        }
 
         if(sgd.GetGameDataVersion() < 12)
+        {
             build_order_raw.insert(build_order_raw.end(),
                                    {BuildingType::Skinner, BuildingType::Tannery, BuildingType::LeatherWorks});
+        }
 
         std::copy(build_order_raw.begin(), build_order_raw.end(), build_order.begin());
 
@@ -1234,13 +1236,12 @@ nobBaseMilitary* GamePlayer::FindClientForArmor(const Ware& ware) const
 
     for(nobMilitary* milBld : buildings.GetMilitaryBuildings())
     {
-        unsigned way_points;
-
         points = milBld->CalcArmorPoints();
         // If 0, it does not want any armor (armor delivery stopped)
         if(points)
         {
             // Find the nearest building
+            unsigned way_points;
             if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points) != RoadPathDirection::None)
             {
                 points -= way_points;

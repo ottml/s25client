@@ -125,7 +125,7 @@ void nofPassiveSoldier::Upgrade()
     // Inventur entsprechend erhöhen und verringern
     owner.IncreaseInventoryJob(job_, 1);
     owner.DecreaseInventoryJob(Job(unsigned(job_) - 1), 1);
-    if(armor)
+    if(hasArmor_)
     {
         owner.IncreaseInventoryJob(jobEnumToAmoredSoldierEnum(job_), 1);
         owner.DecreaseInventoryJob(jobEnumToAmoredSoldierEnum(Job(unsigned(job_) - 1)), 1);

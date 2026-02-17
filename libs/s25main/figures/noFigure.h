@@ -98,7 +98,7 @@ protected:
        ordered_troops list will fail. This problem does not exist for the rank of the soldier. Because the rank of a
        soldier depends on the job id, which is deserialized in noFigure before the goal is deserialized.
     */
-    bool armor;
+    bool hasArmor_;
 
     explicit noFigure(const noFigure&) = default;
 
@@ -153,8 +153,8 @@ public:
     /// Ziel zurückgeben
     noRoadNode* GetGoal() const { return goal_; }
 
-    bool HasArmor() const { return armor; };
-    void SetArmor(bool armor) { this->armor = armor; };
+    bool HasArmor() const { return hasArmor_; };
+    void SetArmor(bool armor) { hasArmor_ = armor; };
 
     /// Getter
     bool GetRoadDir() const { return rs_dir; }
