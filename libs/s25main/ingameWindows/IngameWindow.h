@@ -5,6 +5,7 @@
 #pragma once
 
 #include "DrawPoint.h"
+#include "Point.h"
 #include "SnapOffset.h"
 #include "Window.h"
 #include "helpers/EnumArray.h"
@@ -120,6 +121,11 @@ protected:
     bool IsMessageRelayAllowed() const override;
 
     void SaveOpenStatus(bool isOpen) const;
+
+    void StartDragging(const Position& pos);
+
+    // Return true if dragging stopped
+    bool StopDragging();
 
     unsigned short iwHeight;
     std::string title_;
