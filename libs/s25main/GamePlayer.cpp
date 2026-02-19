@@ -1202,22 +1202,16 @@ nobBaseMilitary* GamePlayer::FindClientForCoin(const Ware& ware) const
             continue;
 
         points = milBld->CalcCoinsPoints();
-        // Wenn 0, will er gar keine Münzen (Goldzufuhr gestoppt)
-        if(points)
+        if(points > best_points)
         {
+            // Find the nearest building
             unsigned way_points;
-
-            // Weg dorthin berechnen
-            if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points) != RoadPathDirection::None)
+            if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points, nullptr,
+                                            points - best_points - 1)
+               != RoadPathDirection::None)
             {
-                // Die Wegpunkte noch davon abziehen
-                points -= way_points;
-                // Besser als der bisher Beste?
-                if(points > best_points)
-                {
-                    best_points = points;
-                    bb = milBld;
-                }
+                best_points = points - way_points;
+                bb = milBld;
             }
         }
     }
@@ -1236,20 +1230,21 @@ nobBaseMilitary* GamePlayer::FindClientForArmor(const Ware& ware) const
 
     for(nobMilitary* milBld : buildings.GetMilitaryBuildings())
     {
+        // Optimization: Ignore if unconnected
+        if(!milBld->IsConnected())
+            continue;
+
         points = milBld->CalcArmorPoints();
-        // If 0, it does not want any armor (armor delivery stopped)
-        if(points)
+        if(points > best_points)
         {
             // Find the nearest building
             unsigned way_points;
-            if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points) != RoadPathDirection::None)
+            if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points, nullptr,
+                                            points - best_points - 1)
+               != RoadPathDirection::None)
             {
-                points -= way_points;
-                if(points > best_points)
-                {
-                    best_points = points;
-                    bb = milBld;
-                }
+                best_points = points - way_points;
+                bb = milBld;
             }
         }
     }
