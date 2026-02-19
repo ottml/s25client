@@ -1387,7 +1387,7 @@ void nobMilitary::SearchCoins()
 bool nobMilitary::WantArmor() const
 {
     // If armor delivery stopped or stock already full, we do not want any armor
-    return (armorAllowed && numArmor + ordered_armor.size() != GetMaxArmorCt() && !new_built);
+    return (armorAllowed && numArmor + ordered_armor.size() < GetMaxArmorCt() && !new_built);
 }
 
 void nobMilitary::SearchArmor()
