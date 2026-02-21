@@ -1189,70 +1189,63 @@ nobBaseWarehouse* GamePlayer::FindWarehouseForWare(const Ware& ware) const
     return wh;
 }
 
-nobBaseMilitary* GamePlayer::FindClientForCoin(const Ware& ware) const
+template<class T_GetPriority, class T_Buildings>
+typename T_Buildings::value_type GamePlayer::FindClientImpl(const Ware& ware, T_GetPriority&& getPriority,
+                                                            const T_Buildings& buildings) const
 {
-    nobBaseMilitary* bb = nullptr;
-    unsigned best_points = 0, points;
-
-    // Militärgebäude durchgehen
-    for(nobMilitary* milBld : buildings.GetMilitaryBuildings())
+    typename T_Buildings::value_type bestClient = nullptr;
+    unsigned bestPoints = 0;
+    const auto& wareLocation = *ware.GetLocation();
+    const MapPoint warePos = wareLocation.GetPos();
+    for(auto* bld : buildings)
     {
         // Optimization: Ignore if unconnected
-        if(!milBld->IsConnected())
+        if(!bld->IsConnected())
             continue;
+        const auto points = getPriority(*bld);
 
-        points = milBld->CalcCoinsPoints();
-        if(points > best_points)
+        // Consider costs for reaching the building
+        // We want only: points - pathCosts > bestPoints, i.e. 0 <= pathCosts < points - bestPoints
+        // So only check if difference is strictly positive, which covers the points==0 case
+        if(points > bestPoints)
         {
-            // Find the nearest building
-            unsigned way_points;
-            if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points, nullptr,
-                                            points - best_points - 1)
+            const unsigned maxPathCosts = points - bestPoints - 1;
+            const unsigned distance = world.CalcDistance(warePos, bld->GetPos());
+            if(distance > maxPathCosts)
+                continue;
+            unsigned pathCosts;
+            if(world.FindPathForWareOnRoads(wareLocation, *bld, &pathCosts, nullptr, maxPathCosts)
                != RoadPathDirection::None)
             {
-                best_points = points - way_points;
-                bb = milBld;
+                RTTR_Assert(points > pathCosts && points - pathCosts > bestPoints);
+                bestPoints = points - pathCosts;
+                bestClient = bld;
             }
         }
     }
+    return bestClient;
+}
 
-    // Wenn kein Abnehmer gefunden wurde, muss es halt in ein Lagerhaus
-    if(!bb)
-        bb = FindWarehouseForWare(ware);
+nobBaseMilitary* GamePlayer::FindClientForCoin(const Ware& ware) const
+{
+    nobBaseMilitary* result = FindClientImpl(
+      ware, [](const nobMilitary& bld) { return bld.CalcCoinsPoints(); }, buildings.GetMilitaryBuildings());
+    // Send to warehouse if no military building needs the coins
+    if(!result)
+        result = FindWarehouseForWare(ware);
 
-    return bb;
+    return result;
 }
 
 nobBaseMilitary* GamePlayer::FindClientForArmor(const Ware& ware) const
 {
-    nobBaseMilitary* bb = nullptr;
-    unsigned best_points = 0, points;
+    nobBaseMilitary* result = FindClientImpl(
+      ware, [](const nobMilitary& bld) { return bld.CalcArmorPoints(); }, buildings.GetMilitaryBuildings());
+    // Send to warehouse if no military building needs the coins
+    if(!result)
+        result = FindWarehouseForWare(ware);
 
-    for(nobMilitary* milBld : buildings.GetMilitaryBuildings())
-    {
-        // Optimization: Ignore if unconnected
-        if(!milBld->IsConnected())
-            continue;
-
-        points = milBld->CalcArmorPoints();
-        if(points > best_points)
-        {
-            // Find the nearest building
-            unsigned way_points;
-            if(world.FindPathForWareOnRoads(*ware.GetLocation(), *milBld, &way_points, nullptr,
-                                            points - best_points - 1)
-               != RoadPathDirection::None)
-            {
-                best_points = points - way_points;
-                bb = milBld;
-            }
-        }
-    }
-
-    if(!bb)
-        bb = FindWarehouseForWare(ware);
-
-    return bb;
+    return result;
 }
 
 unsigned GamePlayer::GetBuidingSitePriority(const noBuildingSite* building_site)

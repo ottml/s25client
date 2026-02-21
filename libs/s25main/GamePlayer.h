@@ -431,6 +431,15 @@ private:
     void PactChanged(PactType pt);
     // Sucht Weg für Job zu entsprechenden noRoadNode
     bool FindWarehouseForJob(Job job, noRoadNode& goal) const;
+
+    /// Find best building for the ware according to the priority reduced by the distance.
+    /// T_GetPriority must be a functor taking a "const noBaseBuilding&" and returning an unsigned priority.
+    /// A zero priority means that the building is not suitable for this ware.
+    /// Returns nullptr if no building was found
+    template<class T_GetPriority, class T_Buildings>
+    typename T_Buildings::value_type FindClientImpl(const Ware& ware, T_GetPriority&& getPriority,
+                                                    const T_Buildings& buildings) const;
+
     /// Prüft, ob der Spieler besiegt wurde
     void TestDefeat();
     nobHQ* GetHQ() const;
