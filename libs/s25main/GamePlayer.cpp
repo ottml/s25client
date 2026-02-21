@@ -1193,48 +1193,36 @@ template<class T_GetPriority, class T_Buildings>
 typename T_Buildings::value_type GamePlayer::FindClientImpl(const Ware& ware, T_GetPriority&& getPriority,
                                                             const T_Buildings& buildings) const
 {
+    // TODO(replay): Unify with FindClientForWare: Sort by estimated priority first for less path finding.
+    // See PR #1720
+    typename T_Buildings::value_type bestClient = nullptr;
+    unsigned bestPoints = 0;
     const auto& wareLocation = *ware.GetLocation();
     const MapPoint warePos = wareLocation.GetPos();
-    std::vector<ClientForWare> possibleClients;
-
     for(auto* bld : buildings)
     {
         // Optimization: Ignore if unconnected
         if(!bld->IsConnected())
             continue;
         const auto points = getPriority(*bld);
-        if(points > 0)
-        {
-            const unsigned distance = world.CalcDistance(warePos, bld->GetPos());
-            possibleClients.push_back(ClientForWare(bld, points > distance ? points - distance : 0, points));
-        }
-    }
 
-    // sort our clients, highest score first
-    std::sort(possibleClients.begin(), possibleClients.end());
-
-    T_Buildings::value_type bestClient = nullptr;
-    unsigned bestPoints = 0;
-    for(auto& possibleClient : possibleClients)
-    {
-        // If our estimate is worse (or equal) best_points, the real value cannot be better.
-        // As our list is sorted, further entries cannot be better either, so stop searching.
-        if(possibleClient.estimate <= bestPoints)
-            break;
-        const auto points = possibleClient.points;
-        RTTR_Assert(points > bestPoints);
-
+        // Consider costs for reaching the building
         // We want only: points - pathCosts > bestPoints, i.e. 0 <= pathCosts < points - bestPoints
-        const unsigned maxPathCosts = points - bestPoints - 1;
-        // Should hold due to estimates
-        RTTR_Assert(world.CalcDistance(warePos, possibleClient.bld->GetPos()) <= maxPathCosts);
-        unsigned pathCosts;
-        if(world.FindPathForWareOnRoads(wareLocation, *possibleClient.bld, &pathCosts, nullptr, maxPathCosts)
-           != RoadPathDirection::None)
+        // So only check if difference is strictly positive, which covers the points==0 case
+        if(points > bestPoints)
         {
-            RTTR_Assert(points > pathCosts && points - pathCosts > bestPoints);
-            bestPoints = points - pathCosts;
-            bestClient = static_cast<T_Buildings::value_type>(possibleClient.bld);
+            const unsigned maxPathCosts = points - bestPoints - 1;
+            const unsigned distance = world.CalcDistance(warePos, bld->GetPos());
+            if(distance > maxPathCosts)
+                continue;
+            unsigned pathCosts;
+            if(world.FindPathForWareOnRoads(wareLocation, *bld, &pathCosts, nullptr, maxPathCosts)
+               != RoadPathDirection::None)
+            {
+                RTTR_Assert(points > pathCosts && points - pathCosts > bestPoints);
+                bestPoints = points - pathCosts;
+                bestClient = bld;
+            }
         }
     }
     return bestClient;
