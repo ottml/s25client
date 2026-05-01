@@ -287,6 +287,34 @@ BOOST_AUTO_TEST_CASE(ClientDetectsMapBufferOverflow)
     BOOST_TEST(client.GetState() == ClientState::Stopped);
 }
 
+BOOST_AUTO_TEST_CASE(ClientReportsWrongPasswordResponse)
+{
+    GameClient client;
+    GameMessageInterface& clientMsgInterface = client;
+    MockClientInterface callbacks;
+    client.SetInterface(&callbacks);
+    TestServer server;
+    const auto serverPort = server.tryListen();
+    BOOST_TEST_REQUIRE(serverPort >= 0);
+    const auto serverType = rttr::test::randomEnum<ServerType>();
+    mock::sequence s;
+    MOCK_EXPECT(callbacks.CI_NextConnectState).in(s).with(ConnectState::Initiated).once();
+    MOCK_EXPECT(callbacks.CI_NextConnectState).in(s).with(ConnectState::VerifyServer).once();
+    MOCK_EXPECT(callbacks.CI_NextConnectState).in(s).with(ConnectState::QueryPw).once();
+    MOCK_EXPECT(callbacks.CI_Error).in(s).with(ClientError::WrongPassword).once();
+
+    BOOST_TEST_REQUIRE(client.Connect("localhost", rttr::test::randString(10), serverType, serverPort, false, false));
+    clientMsgInterface.OnGameMessage(GameMessage_Player_Id(1));
+    clientMsgInterface.OnGameMessage(GameMessage_Server_TypeOK(GameMessage_Server_TypeOK::StatusCode::Ok, ""));
+    BOOST_TEST_REQUIRE(boost::dynamic_pointer_cast<GameMessage_Server_Type>(client.GetMainPlayer().sendQueue.pop()));
+    BOOST_TEST_REQUIRE(
+      boost::dynamic_pointer_cast<GameMessage_Server_Password>(client.GetMainPlayer().sendQueue.pop()));
+
+    clientMsgInterface.OnGameMessage(GameMessage_Server_Password("false"));
+
+    BOOST_TEST(client.GetState() == ClientState::Stopped);
+}
+
 using namespace std::chrono_literals;
 
 BOOST_AUTO_TEST_CASE(CanSetNewSpeed)
