@@ -1331,6 +1331,7 @@ void GameWorld::SetupResources()
     }
     ConvertMineResourceTypes(ResourceType::Gold, target);
     PlaceAndFixWater();
+    RemoveUnusableFishResources();
 }
 
 /**
@@ -1372,6 +1373,21 @@ void GameWorld::PlaceAndFixWater()
             curNodeResource = Resource(ResourceType::Nothing, 0);
 
         SetResource(pt, curNodeResource);
+    }
+}
+
+void GameWorld::RemoveUnusableFishResources()
+{
+    RTTR_FOREACH_PT(MapPoint, GetSize())
+    {
+        if(!GetNode(pt).resources.has(ResourceType::Fish))
+            continue;
+
+        if(!IsWaterPoint(pt)
+           || !helpers::contains_if(GetNeighbours(pt), [this](const MapPoint nb) { return IsWaterPoint(nb); }))
+        {
+            SetResource(pt, Resource(ResourceType::Nothing, 0));
+        }
     }
 }
 

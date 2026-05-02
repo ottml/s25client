@@ -153,6 +153,8 @@ public:
 
     // Fills water depending on terrain and Addon setting
     void PlaceAndFixWater();
+    // Removes fish resources that cannot be reached by fisheries
+    void RemoveUnusableFishResources();
 
     /// Gründet vom Schiff aus eine neue Kolonie, gibt true zurück bei Erfolg
     bool FoundColony(HarborId harbor, unsigned char player, SeaId seaId);

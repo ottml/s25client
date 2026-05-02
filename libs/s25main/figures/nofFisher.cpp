@@ -17,27 +17,6 @@
 #include "random/Random.h"
 #include "world/GameWorld.h"
 
-namespace {
-
-bool IsUsableFishResource(const GameWorld& world, const MapPoint pt)
-{
-    if(!world.GetNode(pt).resources.has(ResourceType::Fish))
-        return false;
-
-    if(!world.IsWaterPoint(pt))
-        return false;
-
-    for(const MapPoint nb : world.GetNeighbours(pt))
-    {
-        if(world.IsWaterPoint(nb))
-            return true;
-    }
-
-    return false;
-}
-
-} // namespace
-
 nofFisher::nofFisher(const MapPoint pos, const unsigned char player, nobUsual* workplace)
     : nofFarmhand(Job::Fisher, pos, player, workplace), fishing_dir(Direction::West), successful(false)
 {}
@@ -117,7 +96,7 @@ void nofFisher::WorkStarted()
     for(Direction dir : helpers::enumRange(RANDOM_ENUM(Direction)))
     {
         const Resource neighbourRes = world->GetNode(world->GetNeighbour(pos, dir)).resources;
-        if(IsUsableFishResource(*world, world->GetNeighbour(pos, dir)))
+        if(neighbourRes.has(ResourceType::Fish))
         {
             fishing_dir = dir;
             fishAmount = neighbourRes.getAmount();
@@ -151,7 +130,7 @@ nofFarmhand::PointQuality nofFisher::GetPointQuality(const MapPoint pt, bool /* 
     // irgendwo drumherum muss es Fisch geben
     for(const MapPoint nb : world->GetNeighbours(pt))
     {
-        if(IsUsableFishResource(*world, nb))
+        if(world->GetNode(nb).resources.has(ResourceType::Fish))
             return PointQuality::Class1;
     }
 
