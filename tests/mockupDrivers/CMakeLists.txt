@@ -18,6 +18,11 @@ include(CheckAndAddWarnings)
 check_warning(CXX "-Wno-suggest-override" CXX_WARNING__Wno_suggest_override_SUPPORTED)
 
 if (CXX_WARNING__Wno_suggest_override_SUPPORTED)
-    target_compile_options(videoMockup PRIVATE -Wno-suggest-override)
-    target_compile_options(audioMockup PRIVATE -Wno-suggest-override)
+	add_library(no_suggest_override INTERFACE)
+	target_compile_options(no_suggest_override INTERFACE
+		$<$<COMPILE_LANGUAGE:CXX>:-Wno-suggest-override>
+	)
+
+    target_link_libraries(videoMockup PRIVATE no_suggest_override)
+    target_link_libraries(audioMockup PRIVATE no_suggest_override)
 endif()
