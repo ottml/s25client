@@ -38,12 +38,12 @@ BOOST_FIXTURE_TEST_CASE(ForesterAvoidsPotentialFarmFieldSpots, FarmerFixture)
 {
     initGameRNG();
 
-    const auto isPointAvailable = [](const nofFarmhand* worker, const MapPoint pt) {
-        return worker->GetPointQuality(pt) != nofFarmhand::PointQuality::NotPossible;
+    const auto isPointAvailable = [](const nofFarmhand& worker, const MapPoint pt) {
+        return worker.GetPointQuality(pt) != nofFarmhand::PointQuality::NotPossible;
     };
 
     const MapPoint fieldPt = world.GetNeighbour2(farmPt, 0);
-    BOOST_TEST_REQUIRE(isPointAvailable(farmer, fieldPt));
+    BOOST_TEST_REQUIRE(isPointAvailable(*farmer, fieldPt));
 
     const MapPoint foresterPt = world.MakeMapPoint(world.GetPlayer(0).GetHQPos() - Position(5, 0));
     auto* foresterBuilding = dynamic_cast<nobUsual*>(
@@ -51,12 +51,11 @@ BOOST_FIXTURE_TEST_CASE(ForesterAvoidsPotentialFarmFieldSpots, FarmerFixture)
     BOOST_TEST_REQUIRE(foresterBuilding);
 
     nofForester foresterWorker(world.GetNeighbour(foresterPt, Direction::SouthEast), 0, foresterBuilding);
-    const nofFarmhand* forester = &foresterWorker;
 
-    BOOST_TEST_REQUIRE(isPointAvailable(forester, fieldPt));
+    BOOST_TEST_REQUIRE(isPointAvailable(foresterWorker, fieldPt));
 
     ggs.setSelection(AddonId::FORESTER_FARM_FIELD_AVOIDANCE, 1);
-    BOOST_TEST_REQUIRE(!isPointAvailable(forester, fieldPt));
+    BOOST_TEST_REQUIRE(!isPointAvailable(foresterWorker, fieldPt));
 }
 
 BOOST_FIXTURE_TEST_CASE(FarmFieldPlanting, FarmerFixture)
