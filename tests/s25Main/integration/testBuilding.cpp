@@ -517,11 +517,28 @@ BOOST_FIXTURE_TEST_CASE(FisherIgnoresIsolatedFishWater, EmptyWorldFixture1PBigge
     BOOST_TEST_REQUIRE(!world.GetNode(fishPt).resources.has(ResourceType::Fish));
     BOOST_TEST_REQUIRE((fisher.GetPointQuality(workPt, false) == nofFarmhand::PointQuality::NotPossible));
 
-    makeWaterPoint(world.GetNeighbour(fishPt, Direction::East));
+    const MapPoint connectedFishPt = world.GetNeighbour(fishPt, Direction::East);
+    makeWaterPoint(connectedFishPt);
     world.SetResource(fishPt, Resource(ResourceType::Fish, 4));
+    world.SetResource(connectedFishPt, Resource(ResourceType::Fish, 4));
     world.SetupResources();
 
     BOOST_TEST_REQUIRE(world.GetNode(fishPt).resources.has(ResourceType::Fish));
+    BOOST_TEST_REQUIRE(world.GetNode(connectedFishPt).resources.has(ResourceType::Fish));
     BOOST_TEST_REQUIRE((fisher.GetPointQuality(workPt, false) == nofFarmhand::PointQuality::Class1));
+
+    const MapPoint rowEndFishPt(world.GetWidth() - 1, 10);
+    const MapPoint rowEndConnectedWaterPt = world.GetNeighbour(rowEndFishPt, Direction::West);
+    const MapPoint nextRowFishPt(0, rowEndFishPt.y + 1);
+
+    makeWaterPoint(rowEndFishPt);
+    makeWaterPoint(rowEndConnectedWaterPt);
+    makeWaterPoint(nextRowFishPt);
+    world.SetResource(rowEndFishPt, Resource(ResourceType::Fish, 4));
+    world.SetResource(nextRowFishPt, Resource(ResourceType::Fish, 4));
+    world.SetupResources();
+
+    BOOST_TEST_REQUIRE(world.GetNode(rowEndFishPt).resources.has(ResourceType::Fish));
+    BOOST_TEST_REQUIRE(!world.GetNode(nextRowFishPt).resources.has(ResourceType::Fish));
 }
 BOOST_AUTO_TEST_SUITE_END()

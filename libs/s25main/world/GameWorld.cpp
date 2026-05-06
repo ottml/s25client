@@ -1378,15 +1378,26 @@ void GameWorld::PlaceAndFixWater()
 
 void GameWorld::RemoveUnusableFishResources()
 {
-    RTTR_FOREACH_PT(MapPoint, GetSize())
+    for(MapCoord y = 0; y < GetHeight(); ++y)
     {
-        if(!GetNode(pt).resources.has(ResourceType::Fish))
-            continue;
-
-        if(!IsWaterPoint(pt)
-           || !helpers::contains_if(GetNeighbours(pt), [this](const MapPoint nb) { return IsWaterPoint(nb); }))
+        bool previousKeptFishWater = false;
+        for(MapCoord x = 0; x < GetWidth(); ++x)
         {
-            SetResource(pt, Resource(ResourceType::Nothing, 0));
+            const MapPoint pt(x, y);
+            bool keptFishWater = false;
+
+            if(GetNode(pt).resources.has(ResourceType::Fish))
+            {
+                if(!IsWaterPoint(pt))
+                    SetResource(pt, Resource(ResourceType::Nothing, 0));
+                else if(previousKeptFishWater)
+                    keptFishWater = true;
+                else if(helpers::contains_if(GetNeighbours(pt), [this](const MapPoint nb) { return IsWaterPoint(nb); }))
+                    keptFishWater = true;
+                else
+                    SetResource(pt, Resource(ResourceType::Nothing, 0));
+            }
+            previousKeptFishWater = keptFishWater;
         }
     }
 }
