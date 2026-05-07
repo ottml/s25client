@@ -337,7 +337,7 @@ void GameClient::StartGame(const unsigned random_init)
             OnError(ClientError::InvalidMap);
             return;
         }
-        gameWorld.SetupResources();
+        MapLoader::SetupResources(gameWorld);
     }
     gameWorld.InitAfterLoad();
 

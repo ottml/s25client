@@ -17,6 +17,7 @@
 #include "worldFixtures/WorldFixture.h"
 #include "worldFixtures/terrainHelpers.h"
 #include "world/GameWorldViewer.h"
+#include "world/MapLoader.h"
 #include "nodeObjs/noEnvObject.h"
 #include "nodeObjs/noStaticObject.h"
 #include "gameTypes/GameTypesOutput.h"
@@ -512,7 +513,7 @@ BOOST_FIXTURE_TEST_CASE(FisherIgnoresIsolatedFishWater, EmptyWorldFixture1PBigge
 
     makeWaterPoint(fishPt);
     world.SetResource(fishPt, Resource(ResourceType::Fish, 4));
-    world.SetupResources();
+    MapLoader::SetupResources(world);
 
     BOOST_TEST_REQUIRE(!world.GetNode(fishPt).resources.has(ResourceType::Fish));
     BOOST_TEST_REQUIRE((fisher.GetPointQuality(workPt, false) == nofFarmhand::PointQuality::NotPossible));
@@ -521,7 +522,7 @@ BOOST_FIXTURE_TEST_CASE(FisherIgnoresIsolatedFishWater, EmptyWorldFixture1PBigge
     makeWaterPoint(connectedFishPt);
     world.SetResource(fishPt, Resource(ResourceType::Fish, 4));
     world.SetResource(connectedFishPt, Resource(ResourceType::Fish, 4));
-    world.SetupResources();
+    MapLoader::SetupResources(world);
 
     BOOST_TEST_REQUIRE(world.GetNode(fishPt).resources.has(ResourceType::Fish));
     BOOST_TEST_REQUIRE(world.GetNode(connectedFishPt).resources.has(ResourceType::Fish));
@@ -536,7 +537,7 @@ BOOST_FIXTURE_TEST_CASE(FisherIgnoresIsolatedFishWater, EmptyWorldFixture1PBigge
     makeWaterPoint(nextRowFishPt);
     world.SetResource(rowEndFishPt, Resource(ResourceType::Fish, 4));
     world.SetResource(nextRowFishPt, Resource(ResourceType::Fish, 4));
-    world.SetupResources();
+    MapLoader::SetupResources(world);
 
     BOOST_TEST_REQUIRE(world.GetNode(rowEndFishPt).resources.has(ResourceType::Fish));
     BOOST_TEST_REQUIRE(!world.GetNode(nextRowFishPt).resources.has(ResourceType::Fish));

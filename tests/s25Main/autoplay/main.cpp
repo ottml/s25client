@@ -70,7 +70,7 @@ static void playReplay(const boost::filesystem::path& replayPath)
 
     MapLoader loader(gameWorld);
     BOOST_TEST_REQUIRE(loader.Load(mapfile.filePath));
-    gameWorld.SetupResources();
+    MapLoader::SetupResources(gameWorld);
     gameWorld.InitAfterLoad();
 
     bool endOfReplay = false;
