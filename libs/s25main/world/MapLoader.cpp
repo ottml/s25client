@@ -199,9 +199,7 @@ void MapLoader::RemoveUnusableFishResources(GameWorldBase& world)
 
             if(world.GetNode(pt).resources.has(ResourceType::Fish))
             {
-                if(!isWaterPoint(pt))
-                    world.SetResource(pt, Resource(ResourceType::Nothing, 0));
-                else if(previousHasFish || helpers::contains_if(world.GetNeighbours(pt), isWaterPoint))
+                if(isWaterPoint(pt) && (previousHasFish || helpers::contains_if(world.GetNeighbours(pt), isWaterPoint)))
                     hasFish = true;
                 else
                     world.SetResource(pt, Resource(ResourceType::Nothing, 0));
