@@ -13,6 +13,7 @@
 #include "buildings/nobHQ.h"
 #include "factories/BuildingFactory.h"
 #include "helpers/IdRange.h"
+#include "helpers/Range.h"
 #include "helpers/containerUtils.h"
 #include "helpers/mathFuncs.h"
 #include "lua/GameDataLoader.h"
@@ -147,7 +148,7 @@ void MapLoader::ConvertMineResourceTypes(GameWorldBase& world, ResourceType from
 
 void MapLoader::PlaceAndFixWater(GameWorldBase& world)
 {
-    bool waterEverywhere = world.GetGGS().getSelection(AddonId::EXHAUSTIBLE_WATER) == 1;
+    const bool waterEverywhere = world.GetGGS().getSelection(AddonId::EXHAUSTIBLE_WATER) == 1;
 
     RTTR_FOREACH_PT(MapPoint, world.GetSize())
     {
@@ -158,10 +159,7 @@ void MapLoader::PlaceAndFixWater(GameWorldBase& world)
             if(!waterEverywhere)
                 continue;
         } else if(curNodeResource.getType() != ResourceType::Water)
-        {
-            // do not override maps resource.
-            continue;
-        }
+            continue; // do not override maps resource.
 
         uint8_t minHumidity = 100;
         for(const DescIdx<TerrainDesc> tIdx : world.GetTerrainsAround(pt))
@@ -175,9 +173,10 @@ void MapLoader::PlaceAndFixWater(GameWorldBase& world)
             }
         }
         if(minHumidity)
+        {
             curNodeResource =
               Resource(ResourceType::Water, waterEverywhere ? 7 : helpers::iround<uint8_t>(minHumidity * 7. / 100.));
-        else
+        } else
             curNodeResource = Resource(ResourceType::Nothing, 0);
 
         world.SetResource(pt, curNodeResource);
@@ -186,27 +185,27 @@ void MapLoader::PlaceAndFixWater(GameWorldBase& world)
 
 void MapLoader::RemoveUnusableFishResources(GameWorldBase& world)
 {
-    for(MapCoord y = 0; y < world.GetHeight(); ++y)
+    const auto isWaterPoint = [&world](const MapPoint nb) { return world.IsWaterPoint(nb); };
+    for(const MapCoord y : helpers::range(world.GetHeight()))
     {
-        bool previousKeptFishWater = false;
-        for(MapCoord x = 0; x < world.GetWidth(); ++x)
+        // Optimization: When there was fish on the previous node (in the same row)
+        // we do not need to check for isolated water points, as there is at least that water point
+        bool previousHasFish = false;
+        for(const MapCoord x : helpers::range(world.GetWidth()))
         {
             const MapPoint pt(x, y);
-            bool keptFishWater = false;
+            bool hasFish = false;
 
             if(world.GetNode(pt).resources.has(ResourceType::Fish))
             {
-                if(!world.IsWaterPoint(pt))
+                if(!isWaterPoint(pt))
                     world.SetResource(pt, Resource(ResourceType::Nothing, 0));
-                else if(previousKeptFishWater)
-                    keptFishWater = true;
-                else if(helpers::contains_if(world.GetNeighbours(pt),
-                                             [&world](const MapPoint nb) { return world.IsWaterPoint(nb); }))
-                    keptFishWater = true;
+                else if(previousHasFish || helpers::contains_if(world.GetNeighbours(pt), isWaterPoint))
+                    hasFish = true;
                 else
                     world.SetResource(pt, Resource(ResourceType::Nothing, 0));
             }
-            previousKeptFishWater = keptFishWater;
+            previousHasFish = hasFish;
         }
     }
 }
@@ -222,7 +221,7 @@ void MapLoader::SetMapExplored(World& world)
     RTTR_FOREACH_PT(MapPoint, world.GetSize())
     {
         // For every player
-        for(unsigned i = 0; i < MAX_PLAYERS; ++i)
+        for(const auto i : helpers::range(MAX_PLAYERS))
         {
             // If we have FoW here, save it
             if(world.GetNode(pt).fow[i].visibility == Visibility::FogOfWar)
