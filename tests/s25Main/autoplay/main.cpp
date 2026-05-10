@@ -1,4 +1,4 @@
-// Copyright (C) 2005 - 2024 Settlers Freaks (sf-team at siedler25.org)
+// Copyright (C) 2005 - 2026 Settlers Freaks (sf-team at siedler25.org)
 //
 // SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -22,6 +22,7 @@
 #include "libsiedler2/libsiedler2.h"
 #include "s25util/tmpFile.h"
 #include <rttr/test/Fixture.hpp>
+#include <s25util/boostTestHelpers.h>
 #include <boost/test/unit_test.hpp>
 
 #if RTTR_HAS_VLD
