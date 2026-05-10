@@ -82,7 +82,10 @@ static void playReplay(const boost::filesystem::path& replayPath, const bool isS
         BOOST_TEST_REQUIRE(mapInfo.mapData.DecompressToFile(mapfile.filePath));
         MapLoader loader(gameWorld);
         BOOST_TEST_REQUIRE(loader.Load(mapfile.filePath));
-        MapLoader::SetupResources(gameWorld);
+        // TODO(replay): Since 8.3 invalid fish is removed when starting from map
+        BOOST_TEST_REQUIRE(replay.GetMajorVersion() == 8u);
+        BOOST_TEST_REQUIRE(replay.GetMinorVersion() < 3u);
+        MapLoader::SetupResources(gameWorld, false);
 
         for(unsigned i = 0; i < gameWorld.GetNumPlayers(); ++i)
             gameWorld.GetPlayer(i).MakeStartPacts();

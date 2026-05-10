@@ -110,7 +110,7 @@ bool MapLoader::PlaceHQs(bool addStartWares)
     return PlaceHQs(world_, hqPositions, addStartWares);
 }
 
-void MapLoader::SetupResources(GameWorldBase& world)
+void MapLoader::SetupResources(GameWorldBase& world, const bool fixFish)
 {
     ResourceType target;
     switch(world.GetGGS().getSelection(AddonId::CHANGE_GOLD_DEPOSITS))
@@ -124,7 +124,8 @@ void MapLoader::SetupResources(GameWorldBase& world)
     }
     ConvertMineResourceTypes(world, ResourceType::Gold, target);
     PlaceAndFixWater(world);
-    RemoveUnusableFishResources(world);
+    if(fixFish)
+        RemoveUnusableFishResources(world);
 }
 
 void MapLoader::ConvertMineResourceTypes(GameWorldBase& world, ResourceType from, ResourceType to)

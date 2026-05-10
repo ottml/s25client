@@ -337,7 +337,9 @@ void GameClient::StartGame(const unsigned random_init)
             OnError(ClientError::InvalidMap);
             return;
         }
-        MapLoader::SetupResources(gameWorld);
+        // TODO (Replay): Always use true
+        const bool fixFish = !GetReplay() || GetReplay()->GetMinorVersion() >= 3;
+        MapLoader::SetupResources(gameWorld, fixFish);
     }
     gameWorld.InitAfterLoad();
 

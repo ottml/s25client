@@ -52,7 +52,8 @@ public:
     /// Return false if there was an error (e.g. invalid start position)
     bool PlaceHQs(bool addStartWares = true);
     /// Setup resources like gold and water after loading a new map.
-    static void SetupResources(GameWorldBase& world);
+    /// TODO(Replay): Remove fixFish (always set to true)
+    static void SetupResources(GameWorldBase& world, bool fixFish = true);
 
     /// Return the (original/unshuffled) position of the players HQ (only valid after successful load)
     MapPoint GetOriginalHQPos(unsigned player) const { return hqPositions_[player]; }
