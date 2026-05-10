@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "GamePlayer.h"
 #include "Replay.h"
+#include "Savegame.h"
 #include "Timer.h"
 #include "helpers/chronoIO.h"
 #include "network/PlayerGameCommands.h"
@@ -31,6 +32,14 @@ struct Fixture : rttr::test::Fixture
 {
     Fixture() { libsiedler2::setAllocator(new GlAllocator); }
 };
+struct MockGameState : ILocalGameState
+{
+public:
+    unsigned GetPlayerId() const override { return 0; }
+    bool IsHost() const override { return true; }
+    std::string FormatGFTime(unsigned) const override { return ""; }
+    void SystemChat(const std::string& text) override {}
+};
 BOOST_GLOBAL_FIXTURE(Fixture);
 
 static boost::test_tools::predicate_result verifyChecksum(const AsyncChecksum& actual, const AsyncChecksum& expected,
@@ -47,17 +56,12 @@ static boost::test_tools::predicate_result verifyChecksum(const AsyncChecksum& a
     // LCOV_EXCL_STOP
 }
 
-static void playReplay(const boost::filesystem::path& replayPath)
+static void playReplay(const boost::filesystem::path& replayPath, const bool isSavegame)
 {
     Replay replay;
     BOOST_TEST_REQUIRE(replay.LoadHeader(replayPath));
     MapInfo mapInfo;
     BOOST_TEST_REQUIRE(replay.LoadGameData(mapInfo));
-    BOOST_TEST_REQUIRE(!mapInfo.savegame); // Must be from start
-    TmpFile mapfile;
-    mapfile.close();
-    BOOST_TEST_REQUIRE(mapInfo.mapData.DecompressToFile(mapfile.filePath));
-
     std::vector<PlayerInfo> players;
     for(unsigned i = 0; i < replay.GetNumPlayers(); i++)
         players.emplace_back(replay.GetPlayer(i));
@@ -65,12 +69,25 @@ static void playReplay(const boost::filesystem::path& replayPath)
     RANDOM.Init(replay.getSeed());
     GameWorld& gameWorld = game.world_;
 
-    for(unsigned i = 0; i < gameWorld.GetNumPlayers(); ++i)
-        gameWorld.GetPlayer(i).MakeStartPacts();
+    if(isSavegame)
+    {
+        BOOST_TEST_REQUIRE(mapInfo.savegame);
+        MockGameState gs;
+        mapInfo.savegame->sgd.ReadSnapshot(game, gs);
+    } else
+    {
+        TmpFile mapfile;
+        mapfile.close();
+        BOOST_TEST_REQUIRE(!mapInfo.savegame);
+        BOOST_TEST_REQUIRE(mapInfo.mapData.DecompressToFile(mapfile.filePath));
+        MapLoader loader(gameWorld);
+        BOOST_TEST_REQUIRE(loader.Load(mapfile.filePath));
+        MapLoader::SetupResources(gameWorld);
 
-    MapLoader loader(gameWorld);
-    BOOST_TEST_REQUIRE(loader.Load(mapfile.filePath));
-    MapLoader::SetupResources(gameWorld);
+        for(unsigned i = 0; i < gameWorld.GetNumPlayers(); ++i)
+            gameWorld.GetPlayer(i).MakeStartPacts();
+    }
+
     gameWorld.InitAfterLoad();
 
     bool endOfReplay = false;
@@ -111,14 +128,15 @@ static void playReplay(const boost::filesystem::path& replayPath)
 
 BOOST_AUTO_TEST_CASE(Play200kReplay)
 {
-    // Map: Big Slaughter v2
+    // Map: Others/Big Slaughter v2
     // 7 x Hard KI
     // 2 KIs each in Teams 1-3, 1 in Team 4
     // Player KI without team ("WINTER" + F10)
     // Default addon settings
+    // Save immediately, then load (so savegame is embedded instead of map)
     // 200k GFs run (+ a bit)
     const boost::filesystem::path replayPath = rttr::test::rttrBaseDir / "tests" / "testData" / "200kGFs.rpl";
-    playReplay(replayPath);
+    playReplay(replayPath, true);
 }
 
 BOOST_AUTO_TEST_CASE(PlaySeaReplay)
@@ -128,5 +146,5 @@ BOOST_AUTO_TEST_CASE(PlaySeaReplay)
     // No teams, Sea attacks enabled (harbors block), ships fast
     // 300k GFs run (+ a bit)
     const boost::filesystem::path replayPath = rttr::test::rttrBaseDir / "tests" / "testData" / "SeaMap300kGfs.rpl";
-    playReplay(replayPath);
+    playReplay(replayPath, false);
 }
