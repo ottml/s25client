@@ -38,7 +38,7 @@ public:
     unsigned GetPlayerId() const override { return 0; }
     bool IsHost() const override { return true; }
     std::string FormatGFTime(unsigned) const override { return ""; }
-    void SystemChat(const std::string& text) override {}
+    void SystemChat(const std::string&) override {}
 };
 BOOST_GLOBAL_FIXTURE(Fixture);
 
