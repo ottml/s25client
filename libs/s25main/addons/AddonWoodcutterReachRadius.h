@@ -22,7 +22,7 @@ public:
     AddonWoodcutterReachRadius()
         : AddonList(AddonId::WOODCUTTER_REACH_RADIUS, AddonGroup::GamePlay,
                     _("Adjust woodcutter's range"),
-                    _("Adjust the woodcutter's cutting range."),
+                    _("Increase the radius in which the woodcutter searches for trees."),
                     {
                       _("Default"),
                       _("+33%"),

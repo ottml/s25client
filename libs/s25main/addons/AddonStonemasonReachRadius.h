@@ -23,7 +23,7 @@ public:
     AddonStonemasonReachRadius()
         : AddonList(AddonId::STONEMASON_REACH_RADIUS, AddonGroup::GamePlay,
                     _("Adjust stonemason's range"),
-                    _("Adjust the stonemason's mining range."),
+                    _("Increase the radius in which the stonemason searches for stone."),
                     {
                       _("Default"),
                       _("+25%"),

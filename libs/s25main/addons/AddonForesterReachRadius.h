@@ -22,7 +22,7 @@ public:
     AddonForesterReachRadius()
         : AddonList(AddonId::FORESTER_REACH_RADIUS, AddonGroup::GamePlay,
                     _("Adjust forester's range"),
-                    _("Adjust the forester's planting range."),
+                    _("Increase the radius in which the forester plants trees."),
                     {
                       _("Default"),
                       _("+33%"),
