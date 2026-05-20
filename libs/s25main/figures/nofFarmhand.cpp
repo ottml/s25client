@@ -43,7 +43,7 @@ unsigned nofFarmhand::GetWorkRadius(const Job job)
         case Job::CharBurner: return 3;
         case Job::Woodcutter:
         {
-            unsigned sel = world->GetGGS().getSelection(AddonId::WOODCUTTER_REACH_RADIUS);
+            const unsigned sel = world->GetGGS().getSelection(AddonId::WOODCUTTER_REACH_RADIUS);
             return woodcutterRadiusValues[sel];
         }
         case Job::Forester:
