@@ -54,7 +54,7 @@ unsigned nofFarmhand::GetWorkRadius(const Job job)
         case Job::Fisher: return 7;
         case Job::Stonemason:
         {
-            unsigned sel = world->GetGGS().getSelection(AddonId::STONEMASON_REACH_RADIUS);
+            const unsigned sel = world->GetGGS().getSelection(AddonId::STONEMASON_REACH_RADIUS);
             return stonemasonRadiusValues[sel];
         }
         default: throw std::logic_error("Invalid job");
