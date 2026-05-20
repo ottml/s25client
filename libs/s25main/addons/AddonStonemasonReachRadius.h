@@ -12,7 +12,7 @@ const std::array<unsigned, 7> stonemasonRadiusValues = {
     10, // +25%
     12, // +50%
     14, // +75%
-    15, // +100%
+    16, // +100%
     20, // +150%
     24  // +200%
 };
