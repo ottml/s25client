@@ -66,3 +66,8 @@
 #include "addons/AddonLeather.h"
 #include "addons/AddonNoArmorDefault.h"
 #include "addons/AddonWine.h"
+
+#include "addons/AddonForesterReachRadius.h"
+#include "addons/AddonWoodcutterReachRadius.h"
+#include "addons/AddonStonemasonReachRadius.h"
+

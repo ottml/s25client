@@ -105,7 +105,10 @@ void GlobalGameSettings::registerAllAddons()
         AddonLeather,
         AddonNoArmorDefault,
         AddonArmorCapturedBld,
-        AddonForesterFarmFieldAvoidance
+        AddonForesterFarmFieldAvoidance,
+        AddonForesterReachRadius,
+        AddonWoodcutterReachRadius,
+        AddonStonemasonReachRadius
     >;
     // clang-format on
     using namespace boost::mp11;
