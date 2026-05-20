@@ -68,6 +68,5 @@
 #include "addons/AddonWine.h"
 
 #include "addons/AddonForesterReachRadius.h"
-#include "addons/AddonWoodcutterReachRadius.h"
 #include "addons/AddonStonemasonReachRadius.h"
-
+#include "addons/AddonWoodcutterReachRadius.h"

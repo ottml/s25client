@@ -8,21 +8,20 @@
 #include "mygettext/mygettext.h"
 
 const std::array<unsigned, 7> stonemasonRadiusValues = {
-    8,  // Default
-    10, // +25%
-    12, // +50%
-    14, // +75%
-    16, // +100%
-    20, // +150%
-    24  // +200%
+  8,  // Default
+  10, // +25%
+  12, // +50%
+  14, // +75%
+  16, // +100%
+  20, // +150%
+  24  // +200%
 };
 
 class AddonStonemasonReachRadius : public AddonList
 {
 public:
     AddonStonemasonReachRadius()
-        : AddonList(AddonId::STONEMASON_REACH_RADIUS, AddonGroup::GamePlay,
-                    _("Adjust stonemason's range"),
+        : AddonList(AddonId::STONEMASON_REACH_RADIUS, AddonGroup::GamePlay, _("Adjust stonemason's range"),
                     _("Increase the radius in which the stonemason searches for stone."),
                     {
                       _("Default"),

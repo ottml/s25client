@@ -14,8 +14,8 @@
 
 #include "GlobalGameSettings.h"
 #include "addons/AddonForesterReachRadius.h"
-#include "addons/AddonWoodcutterReachRadius.h"
 #include "addons/AddonStonemasonReachRadius.h"
+#include "addons/AddonWoodcutterReachRadius.h"
 
 nofFarmhand::nofFarmhand(const Job job, const MapPoint pos, const unsigned char player, nobUsual* workplace)
     : nofBuildingWorker(job, pos, player, workplace), dest(0, 0)
